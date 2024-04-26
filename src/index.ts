@@ -117,6 +117,7 @@ async function emitTokenEvents() {
   console.log("Transfer Transaction Signature 2:", transferTxId2);
 }
 
+// This gives you an example of what the high-level wrapper methods do under the hood
 async function transferLamports(
   owner: Keypair,
   lamports: number,
