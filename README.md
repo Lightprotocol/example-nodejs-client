@@ -11,7 +11,7 @@ Commonjs script that executes basic compression/decompression/transfer instructi
 git clone git@github.com:Lightprotocol/light-protocol.git
 
 ### Checkout pinned commit
-git checkout tags/js-v0.2.0
+git checkout tags/js-v0.2.2
 ```
 
 **Now, follow the readme instruction to build and run the CLI https://github.com/Lightprotocol/light-protocol/blob/js-v0.2.0/cli/README.md**
