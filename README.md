@@ -14,7 +14,7 @@ git clone git@github.com:Lightprotocol/light-protocol.git
 git checkout tags/js-v0.2.2
 ```
 
-**Now, follow the readme instruction to build and run the CLI https://github.com/Lightprotocol/light-protocol/blob/js-v0.2.0/cli/README.md**
+**Now, follow the readme instruction to build and run the CLI https://github.com/Lightprotocol/light-protocol/blob/js-v0.2.2/cli/README.md**
 
 ### Run this example
 
