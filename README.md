@@ -4,22 +4,17 @@ Commonjs script that executes basic compression/decompression/transfer instructi
 
 ### Requirements
 
-1. Build the CLI in the Light Monorepo
-
-```bash
-### Clone the Light Monorepo
-git clone git@github.com:Lightprotocol/light-protocol.git
-
-### Checkout pinned commit
-git checkout tags/js-v0.2.2
-```
-
-**Now, follow the readme instruction to build and run the CLI https://github.com/Lightprotocol/light-protocol/blob/js-v0.2.2/cli/README.md**
+**You need to have the CLI installed to run this example. For installation instructions, see [here](https://github.com/Lightprotocol/light-protocol/tree/js-0.2.1-release/cli)**
 
 ### Run this example
 
 ```bash
-# you may have to enter a dialog to install required peer dependencies
+# Start a light test-validator using the CLI
+light test-validator
+```
+
+```bash
+# You may have to enter a dialog to install required peer dependencies
 npm i
 npm start
 ```
