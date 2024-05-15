@@ -4,7 +4,7 @@ Commonjs script that executes basic compression/decompression/transfer instructi
 
 ### Requirements
 
-**You need to have the CLI installed to run this example. For installation instructions, see [here](https://github.com/Lightprotocol/light-protocol/tree/js-0.2.1-release/cli#readme)**
+**You need to have the CLI installed to run this example. For installation instructions, see [here](https://github.com/Lightprotocol/light-protocol/tree/main/cli#readme)**
 
 ### Run this example
 
