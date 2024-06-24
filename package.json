@@ -2,10 +2,14 @@
   "name": "example-nodejs-client",
   "version": "0.1.0",
   "description": "",
-  "main": "node src/index.ts",
+  "main": "node src/extended.ts",
   "type": "commonjs",
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "example": "npm run connection && npm run lamports && npm run token",
+    "extended": "ts-node src/extended.ts",
+    "lamports": "ts-node src/lamports.ts",
+    "token": "ts-node src/token.ts",
+    "connection": "ts-node src/connection.ts"
   },
   "repository": {
     "type": "git",

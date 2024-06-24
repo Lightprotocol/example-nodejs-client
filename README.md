@@ -4,17 +4,25 @@ Commonjs script that executes basic compression/decompression/transfer instructi
 
 ### Requirements
 
-**You need to have the CLI installed to run this example. For installation instructions, see [here](https://github.com/Lightprotocol/light-protocol/tree/main/cli#readme)**
+**You need to have the CLI installed to run this example on Localnet. For installation instructions, see [here](https://github.com/Lightprotocol/light-protocol/tree/main/cli#readme)**
 
-### Run this example
+### Start a light test-validator for localnet
 
 ```bash
 # Start a light test-validator using the CLI
 light test-validator
 ```
 
+### Run the full example
+
 ```bash
-# You may have to enter a dialog to install required peer dependencies
-npm i
-npm start
+npm install
+```
+
+```bash
+# npm run connection
+# npm run token
+# npm run lamports
+# npm run extended
+npm run example
 ```
