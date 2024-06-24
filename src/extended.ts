@@ -81,7 +81,7 @@ async function emitTokenEvents() {
   const { mint, transactionSignature } = await createMint(
     connection,
     payer,
-    payer,
+    payer.publicKey,
     9
   );
 
