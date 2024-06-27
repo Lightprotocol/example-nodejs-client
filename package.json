@@ -24,8 +24,8 @@
   "homepage": "https://github.com/Lightprotocol/example-nodejs-client#readme",
   "dependencies": {
     "@coral-xyz/anchor": "0.29.0",
-    "@lightprotocol/compressed-token": "0.3.1",
-    "@lightprotocol/stateless.js": "0.4.1",
+    "@lightprotocol/compressed-token": "0.3.2",
+    "@lightprotocol/stateless.js": "0.4.2",
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.91.7",
     "@types/node": "^20.12.7",
