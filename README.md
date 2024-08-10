@@ -13,7 +13,15 @@ Commonjs script that executes basic compression/decompression/transfer instructi
 light test-validator
 ```
 
-### Run the full example
+### Running the Token Example
+
+To run the `token.ts` example:
+
+1. By default, it interacts with Solana Devnet.
+2. Create a `.env` file in the root directory using `.env.example` as a template.
+3. Set your `RPC_KEY` in the `.env` file.
+
+### Running the full example
 
 ```bash
 npm install
