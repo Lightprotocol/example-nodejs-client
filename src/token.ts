@@ -2,23 +2,23 @@ import {
   LightSystemProgram,
   Rpc,
   confirmTx,
+  createAccount,
   createRpc,
 } from "@lightprotocol/stateless.js";
 import { createMint, mintTo, transfer } from "@lightprotocol/compressed-token";
 import { Keypair } from "@solana/web3.js";
+import { randomBytes } from "crypto";
+import { RPC_ENDPOINT } from "./constants";
 
 const payer = Keypair.generate();
+console.log("payer", payer.publicKey.toBase58());
 const tokenRecipient = Keypair.generate();
 
 /// Localnet, expects `light test-validator` to be running:
-const connection: Rpc = createRpc();
+// const connection: Rpc = createRpc();
 
 /// Uncomment to use Testnet:
-// const connection: Rpc = createRpc(
-//   "https://zk-testnet.helius.dev:8899", // rpc
-//   "https://zk-testnet.helius.dev:8784", // zk compression rpc
-//   "https://zk-testnet.helius.dev:3001" // prover
-// );
+const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
 const main = async () => {
   /// airdrop lamports to pay fees
@@ -31,7 +31,6 @@ const main = async () => {
     connection,
     await connection.requestAirdrop(tokenRecipient.publicKey, 1e6)
   );
-
   /// Create compressed-token mint
   const { mint, transactionSignature } = await createMint(
     connection,

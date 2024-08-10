@@ -123,9 +123,9 @@ async function transferLamports(
   lamports: number,
   toAddress: PublicKey
 ) {
-  const compressedAccounts = await connection.getCompressedAccountsByOwner(
-    owner.publicKey
-  );
+  const compressedAccounts = (
+    await connection.getCompressedAccountsByOwner(owner.publicKey)
+  ).items;
 
   const [inputAccounts] = selectMinCompressedSolAccountsForTransfer(
     compressedAccounts,

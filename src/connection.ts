@@ -1,10 +1,8 @@
+import { RPC_ENDPOINT } from "./constants";
+
 const stateless = require("@lightprotocol/stateless.js");
 
-const connection = stateless.createRpc(
-  "https://zk-testnet.helius.dev:8899", // rpc
-  "https://zk-testnet.helius.dev:8784", // zk compression rpc
-  "https://zk-testnet.helius.dev:3001" // prover
-);
+const connection = stateless.createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
 async function main() {
   let slot = await connection.getSlot();

@@ -1,4 +1,7 @@
 import { confirmTx } from "@lightprotocol/stateless.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 /// Compressing SOL
 const {
@@ -16,11 +19,10 @@ const fromKeypair = Keypair.generate();
 /// Localnet, expects `light test-validator` to be running:
 const connection = createRpc();
 
-/// Uncomment to use Testnet:
+/// Uncomment to use Devnet:
 // const connection = createRpc(
-//   "https://zk-testnet.helius.dev:8899", // rpc
-//   "https://zk-testnet.helius.dev:8784", // zk compression rpc
-//   "https://zk-testnet.helius.dev:3001" // prover
+//   RPC_ENDPOINT,
+//   RPC_ENDPOINT
 // );
 
 (async () => {

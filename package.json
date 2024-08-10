@@ -9,7 +9,8 @@
     "extended": "ts-node src/extended.ts",
     "lamports": "ts-node src/lamports.ts",
     "token": "ts-node src/token.ts",
-    "connection": "ts-node src/connection.ts"
+    "connection": "ts-node src/connection.ts",
+    "test": "ts-node src/test.ts"
   },
   "repository": {
     "type": "git",
@@ -24,11 +25,12 @@
   "homepage": "https://github.com/Lightprotocol/example-nodejs-client#readme",
   "dependencies": {
     "@coral-xyz/anchor": "0.29.0",
-    "@lightprotocol/compressed-token": "0.3.2",
-    "@lightprotocol/stateless.js": "0.4.2",
+    "@lightprotocol/compressed-token": "0.8.0",
+    "@lightprotocol/stateless.js": "0.9.0",
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.91.7",
     "@types/node": "^20.12.7",
+    "dotenv": "^16.4.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   }
