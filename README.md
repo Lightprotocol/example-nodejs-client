@@ -32,5 +32,6 @@ npm install
 # npm run token
 # npm run lamports
 # npm run extended
+# npm run lookup-table
 npm run example
 ```

@@ -1,35 +1,26 @@
-import {
-  LightSystemProgram,
-  Rpc,
-  confirmTx,
-  createAccount,
-  createRpc,
-} from "@lightprotocol/stateless.js";
+import { Rpc, confirmTx, createRpc } from "@lightprotocol/stateless.js";
 import { createMint, mintTo, transfer } from "@lightprotocol/compressed-token";
 import { Keypair } from "@solana/web3.js";
-import { randomBytes } from "crypto";
 import { RPC_ENDPOINT } from "./constants";
-
 const payer = Keypair.generate();
-console.log("payer", payer.publicKey.toBase58());
 const tokenRecipient = Keypair.generate();
 
 /// Localnet, expects `light test-validator` to be running:
-// const connection: Rpc = createRpc();
+const connection: Rpc = createRpc();
 
 /// Uncomment to use Testnet:
-const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
+// const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
 const main = async () => {
   /// airdrop lamports to pay fees
   await confirmTx(
     connection,
-    await connection.requestAirdrop(payer.publicKey, 10e9)
+    await connection.requestAirdrop(payer.publicKey, 1e7)
   );
 
   await confirmTx(
     connection,
-    await connection.requestAirdrop(tokenRecipient.publicKey, 1e6)
+    await connection.requestAirdrop(tokenRecipient.publicKey, 1e5)
   );
   /// Create compressed-token mint
   const { mint, transactionSignature } = await createMint(
@@ -48,7 +39,7 @@ const main = async () => {
     mint,
     payer.publicKey,
     payer,
-    1e9
+    1e7
   );
 
   console.log(`mint-to      success! txId: ${mintToTxId}`);
@@ -58,7 +49,7 @@ const main = async () => {
     connection,
     payer,
     mint,
-    7e8,
+    7e5,
     payer,
     tokenRecipient.publicKey
   );
