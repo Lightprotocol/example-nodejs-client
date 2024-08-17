@@ -19,12 +19,6 @@ const fromKeypair = Keypair.generate();
 /// Localnet, expects `light test-validator` to be running:
 const connection = createRpc();
 
-/// Uncomment to use Devnet:
-// const connection = createRpc(
-//   RPC_ENDPOINT,
-//   RPC_ENDPOINT
-// );
-
 (async () => {
   /// airdrop lamports to pay tx fees
   await confirmTx(
