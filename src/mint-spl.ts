@@ -32,7 +32,7 @@ const main = async () => {
     payer.publicKey
   );
 
-  console.log(`ATA: ${ata.address}`);
+  console.log(`mint: ${mint.toBase58()}`);
   /// Mint SPL
   await mintToSpl(connection, payer, mint, ata.address, payer.publicKey, 1e5);
 };
