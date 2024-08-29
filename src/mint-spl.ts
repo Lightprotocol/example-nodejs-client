@@ -5,12 +5,9 @@ import {
   mintTo as mintToSpl,
 } from "@solana/spl-token";
 import { PAYER_KEYPAIR, RPC_ENDPOINT } from "./constants";
-import { PublicKey } from "@solana/web3.js";
-import { connect } from "http2";
 
 const payer = PAYER_KEYPAIR;
-// const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
-const connection: Rpc = createRpc();
+const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
 const main = async () => {
   /// airdrop lamports to pay fees
@@ -27,9 +24,7 @@ const main = async () => {
   );
   console.log(`create-mint  success! txId: ${transactionSignature}`);
 
-  // connection.getcompressedAccountsByOwnerWithCursor
   // Get ATA
-  // const mint = new PublicKey("9gSxQyxRLW6BaVhWYSjKyetnBaUvhqwBnTiShzBS7CJt");
   const ata = await getOrCreateAssociatedTokenAccount(
     connection,
     payer,

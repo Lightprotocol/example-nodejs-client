@@ -12,10 +12,8 @@ import {
 import * as splToken from "@solana/spl-token";
 
 (async () => {
-  // Send the transaction
   try {
-    const connection: Rpc = createRpc();
-    // const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
+    const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
     const mintAddress = MINT_ADDRESS;
 
     // Todo: Use wallet connection to create browser keypair using signed message
@@ -80,10 +78,9 @@ import * as splToken from "@solana/spl-token";
 
     // Use zk-compression LUT
     // https://www.zkcompression.com/developers/devnet-addresses#lookup-tables
-    // Default: DA35UyyzGTonmEjsbw1VGRACpKxbKUPS2DvrG193QYHC
+    // Default: qAJZMgnQJ8G6vA3WRcjD9Jan1wtKkaCFWLWskxJrR5V
     const lookupTableAddress = new web3.PublicKey(
-      // "DA35UyyzGTonmEjsbw1VGRACpKxbKUPS2DvrG193QYHC"
-      "6rrnW8U4qJ18B3m56NMCCvB66rCNhN3mUsAE4Z6qPznY"
+      "qAJZMgnQJ8G6vA3WRcjD9Jan1wtKkaCFWLWskxJrR5V"
     );
 
     // Get the lookup table account
