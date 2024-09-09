@@ -19,7 +19,7 @@ To run the `token.ts` example:
 
 1. By default, it interacts with Solana Devnet.
 2. Create a `.env` file in the root directory using `.env.example` as a template.
-3. Set your `RPC_KEY` in the `.env` file.
+3. Set your `RPC_ENDPOINT`, `PAYER_KEYPAIR`, `MINT_ADDRESS` in the `.env` file.
 
 ### Running the full example
 
@@ -34,4 +34,5 @@ npm install
 # npm run extended
 # npm run lookup-table
 npm run example
+npm run debug-ix-too-large
 ```
