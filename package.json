@@ -16,7 +16,8 @@
     "debug-ix-too-large": "ts-node src/debug-ix-too-large.ts",
     "pulse": "ts-node src/transfer-pulse.ts",
     "create-account-pulse": "ts-node src/create-account-pulse.ts",
-    "create-account-with-lamports-pulse": "ts-node src/create-account-with-lamports-pulse.ts"
+    "create-account-with-lamports-pulse": "ts-node src/create-account-with-lamports-pulse.ts",
+    "batch-address-load": "ts-node src/batch-address-load.ts"
   },
   "repository": {
     "type": "git",

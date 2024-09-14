@@ -4,12 +4,12 @@ import {
   Rpc,
   transfer,
 } from "@lightprotocol/stateless.js";
-import { SystemProgram, Transaction } from "@solana/web3.js";
+import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
 import { PAYER_KEYPAIR, RPC_ENDPOINT } from "./constants";
 import { PublicKey } from "@solana/web3.js";
+import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 
 const fromKeypair = PAYER_KEYPAIR;
-
 const connection : Rpc= createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
 async function runTransferPulse() {
