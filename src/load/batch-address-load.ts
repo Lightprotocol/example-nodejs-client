@@ -24,20 +24,18 @@ export class TokenDispenser {
   private tokens: number;
   private lastRefillTime: number;
 
-  constructor(private refillRate: number) {
-    this.tokens = refillRate;
+  constructor(private refillRate: number, private maxTokens: number) {
+    this.tokens = maxTokens;
     this.lastRefillTime = Date.now();
   }
 
-  async acquireToken(): Promise<void> {
-    while (true) {
-      this.refillTokens();
-      if (this.tokens > 0) {
-        this.tokens--;
-        return;
-      }
-      await new Promise(resolve => setTimeout(resolve, 10));
+  acquireTokens(count: number): boolean {
+    this.refillTokens();
+    if (this.tokens >= count) {
+      this.tokens -= count;
+      return true;
     }
+    return false;
   }
 
   private refillTokens(): void {
@@ -46,7 +44,7 @@ export class TokenDispenser {
     const newTokens = Math.floor(elapsedTime * this.refillRate);
     
     if (newTokens > 0) {
-      this.tokens = Math.min(this.tokens + newTokens, this.refillRate);
+      this.tokens = Math.min(this.tokens + newTokens, this.maxTokens);
       this.lastRefillTime = now;
     }
   }
@@ -82,7 +80,8 @@ class SimpleMetricsLogger {
 const metricsLogger = new SimpleMetricsLogger('batch-address-load-metrics.log');
 
 const TOKEN_DISPENSER_RATE = 100;
-const tokenDispenser = new TokenDispenser(TOKEN_DISPENSER_RATE);
+const MAX_TOKENS = 1000;
+const tokenDispenser = new TokenDispenser(TOKEN_DISPENSER_RATE, MAX_TOKENS);
 
 async function runCreateAccountPulse() {
   console.log("Starting create account pulse...");
@@ -90,27 +89,29 @@ async function runCreateAccountPulse() {
   let errorCounts: { [key: string]: number } = {};
   let startTime = Date.now();
 
+  const BATCH_SIZE = 50; // Adjust based on performance
+
   while (true) {
-    try {
-      const accountCreations = Array(TOKEN_DISPENSER_RATE).fill(null).map(async () => {
-        await tokenDispenser.acquireToken();
-        try {
-          await createAccount(connection, fromKeypair, LightSystemProgram.programId);
-          totalTxsSent++;
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
-          errorCounts[errorMessage] = (errorCounts[errorMessage] || 0) + 1;
-        }
-      });
-      await Promise.all(accountCreations);
+    if (tokenDispenser.acquireTokens(BATCH_SIZE)) {
+      const batchPromises = Array(BATCH_SIZE).fill(null).map(() => 
+        createAccount(connection, fromKeypair, LightSystemProgram.programId)
+          .then(() => 1)
+          .catch(error => {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            errorCounts[errorMessage] = (errorCounts[errorMessage] || 0) + 1;
+            return 0;
+          })
+      );
+
+      const batchResults = await Promise.all(batchPromises);
+      totalTxsSent += batchResults.reduce((a, b) => a + b, 0);
       
       const elapsedTime = (Date.now() - startTime) / 1000;
       const tps = totalTxsSent / elapsedTime;
       
       metricsLogger.log(`Tx: ${totalTxsSent}, Rate: ${tps.toFixed(2)} tx/s, Errors: ${JSON.stringify(errorCounts)}`);
-    } catch (error) {
-      console.error("Error in main loop:", error);
-      await new Promise(resolve => setTimeout(resolve, 100));
+    } else {
+      await new Promise(resolve => setTimeout(resolve, 10)); // Short delay to prevent tight loop
     }
   }
 }
@@ -186,7 +187,6 @@ async function createAccount(
     [],
   );
 
-  console.log("Sending transaction...");
   const txId = await connection.sendTransaction(tx);
   console.log("Transaction sent:", txId);
   return txId;
