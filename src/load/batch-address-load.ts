@@ -2,7 +2,6 @@ import {
   bn,
   buildAndSignTx,
   CompressedProof,
-  createRpc,
   defaultStaticAccountsStruct,
   defaultTestStateTreeAccounts,
   deriveAddress,
@@ -13,107 +12,114 @@ import {
   packNewAddressParams,
   Rpc,
   toAccountMetas,
+  createRpc,
 } from "@lightprotocol/stateless.js";
-import { ComputeBudgetProgram, ConfirmOptions, Signer, SystemProgram, TransactionInstruction, TransactionSignature } from "@solana/web3.js";
-import { PAYER_KEYPAIR, RPC_ENDPOINT } from "./constants";
+import { ConfirmOptions, Signer, SystemProgram, TransactionInstruction, TransactionSignature, ComputeBudgetProgram, BlockhashWithExpiryBlockHeight } from "@solana/web3.js";
+import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
 import { PublicKey } from "@solana/web3.js";
 import { randomBytes } from "crypto";
 import fs from 'fs';
 
-console.log("Starting script...");
+export class TokenDispenser {
+  private tokens: number;
+  private lastRefillTime: number;
 
-const fromKeypair = PAYER_KEYPAIR;
-const connection : Rpc= createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
-let lastBlockhash: string | null = null;
-let lastBlockhashTime: number = 0;
-let totalTxsSent = 0;
-let errorCounts: { [key: string]: number } = {};
-
-const MAX_TPS = 10;
-let availableTokens = MAX_TPS;
-const tokenRefillInterval = 1000; // 1 second
-
-async function getBlockhash(): Promise<string> {
-  const now = Date.now();
-  if (!lastBlockhash || now - lastBlockhashTime > 30000) {
-    const { blockhash } = await connection.getLatestBlockhash();
-    lastBlockhash = blockhash;
-    lastBlockhashTime = now;
+  constructor(private refillRate: number) {
+    this.tokens = refillRate;
+    this.lastRefillTime = Date.now();
   }
-  return lastBlockhash;
-}
 
-function logMetrics(message: string) {
-  const timestamp = new Date().toISOString();
-  fs.appendFileSync('metrics.log', `${timestamp} - ${message}\n`);
-}
+  async acquireToken(): Promise<void> {
+    while (true) {
+      this.refillTokens();
+      if (this.tokens > 0) {
+        this.tokens--;
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
+  }
 
-async function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function refillTokens() {
-  setInterval(() => {
-    availableTokens = Math.min(availableTokens + MAX_TPS, MAX_TPS);
-  }, tokenRefillInterval);
-}
-async function runCreateAccountPulse() {
-  console.log("Starting runCreateAccountPulse...");
-  const startTime = Date.now();
-  let txCount = 0;
-
-  refillTokens();
-
-  while (true) {
-    const availableTxs = Math.min(availableTokens, MAX_TPS);
-    if (availableTxs > 0) {
-      availableTokens -= availableTxs;
-      
-      const txPromises = Array(availableTxs).fill(null).map(() => 
-        createAccount(connection, fromKeypair, LightSystemProgram.programId)
-      );
-
-      Promise.all(txPromises)
-        .then(txIds => {
-          txIds.forEach(txId => {
-            if (txId !== null) {
-              totalTxsSent++;
-              txCount++;
-              console.log(`Transaction sent: ${txId}`);
-            }
-          });
-          
-          const elapsedTime = (Date.now() - startTime) / 1000;
-          const txRate = totalTxsSent / elapsedTime;
-          
-          if (txCount % 100 === 0) {
-            logMetrics(`Tx: ${totalTxsSent}, Rate: ${txRate.toFixed(2)} tx/s, Errors: ${JSON.stringify(errorCounts)}`);
-          }
-          
-          if (txCount % 150 === 0) {
-            return sleep(60000);
-          } else if (txCount % 100 === 0) {
-            return sleep(30000);
-          }
-        })
-        .catch(error => {
-          console.error("Error in createAccount:", error);
-          const errorCode = error.code || 'unknown';
-          errorCounts[errorCode] = (errorCounts[errorCode] || 0) + 1;
-        });
-    } else {
-      await sleep(100); // Wait a bit if no tokens are available
+  private refillTokens(): void {
+    const now = Date.now();
+    const elapsedTime = (now - this.lastRefillTime) / 1000;
+    const newTokens = Math.floor(elapsedTime * this.refillRate);
+    
+    if (newTokens > 0) {
+      this.tokens = Math.min(this.tokens + newTokens, this.refillRate);
+      this.lastRefillTime = now;
     }
   }
 }
 
-console.log("About to run createAccountPulse...");
+const fromKeypair = PAYER_KEYPAIR;
+const connection: Rpc = createRpc(RPC_ENDPOINT!, RPC_ENDPOINT!);
+
+let cachedBlockhash: BlockhashWithExpiryBlockHeight | null = null;
+let lastBlockhashFetch: number = 0;
+
+async function getBlockhash(rpc: Rpc): Promise<string> {
+  const now = Date.now();
+  if (cachedBlockhash && now - lastBlockhashFetch < 30000) {
+    return cachedBlockhash.blockhash;
+  }
+
+  const { blockhash, lastValidBlockHeight } = await rpc.getLatestBlockhash();
+  cachedBlockhash = { blockhash, lastValidBlockHeight };
+  lastBlockhashFetch = now;
+  return blockhash;
+}
+
+class SimpleMetricsLogger {
+  constructor(private logFile: string) {}
+
+  log(message: string) {
+    const timestamp = new Date().toISOString();
+    fs.appendFileSync(this.logFile, `${timestamp} - ${message}\n`);
+  }
+}
+
+const metricsLogger = new SimpleMetricsLogger('batch-address-load-metrics.log');
+
+const TOKEN_DISPENSER_RATE = 100;
+const tokenDispenser = new TokenDispenser(TOKEN_DISPENSER_RATE);
+
+async function runCreateAccountPulse() {
+  console.log("Starting create account pulse...");
+  let totalTxsSent = 0;
+  let errorCounts: { [key: string]: number } = {};
+  let startTime = Date.now();
+
+  while (true) {
+    try {
+      const accountCreations = Array(TOKEN_DISPENSER_RATE).fill(null).map(async () => {
+        await tokenDispenser.acquireToken();
+        try {
+          await createAccount(connection, fromKeypair, LightSystemProgram.programId);
+          totalTxsSent++;
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          errorCounts[errorMessage] = (errorCounts[errorMessage] || 0) + 1;
+        }
+      });
+      await Promise.all(accountCreations);
+      
+      const elapsedTime = (Date.now() - startTime) / 1000;
+      const tps = totalTxsSent / elapsedTime;
+      
+      metricsLogger.log(`Tx: ${totalTxsSent}, Rate: ${tps.toFixed(2)} tx/s, Errors: ${JSON.stringify(errorCounts)}`);
+    } catch (error) {
+      console.error("Error in main loop:", error);
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+}
+
 runCreateAccountPulse().catch(error => {
   console.error("Fatal error in runCreateAccountPulse:", error);
 });
 
-// Adapted from @lightprotocol/stateless.js
-export async function createAccount(
+async function createAccount(
   rpc: Rpc,
   payer: Signer,
   programId: PublicKey,
@@ -122,17 +128,16 @@ export async function createAccount(
   outputStateTree?: PublicKey,
   confirmOptions?: ConfirmOptions,
 ): Promise<TransactionSignature> {
-  const blockhash = await getBlockhash();
+  const blockhash = await getBlockhash(rpc);
 
   addressTree = addressTree ?? defaultTestStateTreeAccounts().addressTree;
   outputStateTree = outputStateTree ?? defaultTestStateTreeAccounts().merkleTree;
   addressQueue = addressQueue ?? defaultTestStateTreeAccounts().addressQueue;
   const instructions = [];
 
-  // Create 1 account in the first instruction
   const seed1 = randomBytes(32);
   const address1 = await deriveAddress(seed1, addressTree);
-  const proof1 = await rpc.getValidityProof(undefined, [bn(address1.toBytes())]);
+  const proof1 = await rpc.getValidityProofDirect(undefined, [bn(address1.toBytes())]);
   const params1: NewAddressParams = {
     seed: seed1,
     addressMerkleTreeRootIndex: proof1.rootIndices[0],
@@ -148,12 +153,11 @@ export async function createAccount(
   });
   instructions.push(ix1);
 
-  // Create 2 accounts in the second instruction
   const seed2 = randomBytes(32);
   const seed3 = randomBytes(32);
   const address2 = await deriveAddress(seed2, addressTree);
   const address3 = await deriveAddress(seed3, addressTree);
-  const proof2 = await rpc.getValidityProof(undefined, [bn(address2.toBytes()), bn(address3.toBytes())]);
+  const proof2 = await rpc.getValidityProofDirect(undefined, [bn(address2.toBytes()), bn(address3.toBytes())]);
   const params2: NewAddressParams = {
     seed: seed2,
     addressMerkleTreeRootIndex: proof2.rootIndices[0],
@@ -182,7 +186,9 @@ export async function createAccount(
     [],
   );
 
-  const txId = await rpc.sendTransaction(tx);
+  console.log("Sending transaction...");
+  const txId = await connection.sendTransaction(tx);
+  console.log("Transaction sent:", txId);
   return txId;
 }
 

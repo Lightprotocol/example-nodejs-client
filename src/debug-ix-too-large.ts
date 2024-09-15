@@ -23,7 +23,6 @@ import * as splToken from "@solana/spl-token";
 
     // Get the source token account for the mint address
     const sourceTokenAccount = await splToken.getOrCreateAssociatedTokenAccount(
-      // @ts-ignore
       connection,
       payer,
       mintAddress,

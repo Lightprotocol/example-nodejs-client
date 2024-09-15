@@ -26,7 +26,7 @@ const main = async () => {
     9
   );
   console.log(`create-mint  success! txId: ${transactionSignature}`);
-
+  console.log(`mint: ${mint.toBase58()}`);
   // connection.getcompressedAccountsByOwnerWithCursor
   // Get ATA
   // const mint = new PublicKey("9gSxQyxRLW6BaVhWYSjKyetnBaUvhqwBnTiShzBS7CJt");
