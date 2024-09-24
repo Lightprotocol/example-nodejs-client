@@ -13,11 +13,11 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 // const connection: Rpc = createRpc();
 
 const main = async () => {
-  /// airdrop lamports to pay fees
-  await confirmTx(
-    connection,
-    await connection.requestAirdrop(payer.publicKey, 1e7)
-  );
+  // /// airdrop lamports to pay fees
+  // await confirmTx(
+  //   connection,
+  //   await connection.requestAirdrop(payer.publicKey, 1e7)
+  // );
 
   const { mint, transactionSignature } = await createMint(
     connection,

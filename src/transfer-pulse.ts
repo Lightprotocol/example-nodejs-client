@@ -21,6 +21,11 @@ async function runTransferPulse() {
     
     while (true) {
       // Transfer 10 lamports to self
+//7FAR1Vgcwg7BX6XfUdWBdhMak6GnC2gokcZfrx2K4Qjx 29 mint: 9D2FgryFZ2Xn92wexNqcmS7KVXrm8SGRXnexsyGG73cZ
+      const p = await connection.getCompressedTokenBalancesByOwner(new PublicKey("7FAR1Vgcwg7BX6XfUdWBdhMak6GnC2gokcZfrx2K4Qjx"))
+      console.log(p.items.map(i => i.balance.toNumber() + " " + i.mint.toBase58()));
+      throw new Error("stop");
+
       const txId = await transfer(connection, fromKeypair, 10, fromKeypair, fromKeypair.publicKey, undefined, {
         skipPreflight: false,
       });

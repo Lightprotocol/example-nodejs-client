@@ -29,7 +29,7 @@ let lastBlockhashTime: number = 0;
 let totalTxsSent = 0;
 let errorCounts: { [key: string]: number } = {};
 
-const MAX_TPS = 10
+const MAX_TPS = 5
 let availableTokens = MAX_TPS;
 const tokenRefillInterval = 1000; // 1 second
 
@@ -45,7 +45,7 @@ async function getBlockhash(): Promise<string> {
 
 function logMetrics(message: string) {
   const timestamp = new Date().toISOString();
-  fs.appendFileSync('metrics.log', `${timestamp} - ${message}\n`);
+  fs.appendFileSync('metrics-remote.log', `${timestamp} - ${message}\n`);
 }
 
 async function sleep(ms: number) {
@@ -86,9 +86,7 @@ async function runCreateAccountPulse() {
           const elapsedTime = (Date.now() - startTime) / 1000;
           const txRate = totalTxsSent / elapsedTime;
           
-          if (txCount % 100 === 0) {
-            logMetrics(`Tx: ${totalTxsSent}, Rate: ${txRate.toFixed(2)} tx/s, Errors: ${JSON.stringify(errorCounts)}`);
-          }
+          logMetrics(`Tx: ${totalTxsSent}, Rate: ${txRate.toFixed(2)} tx/s, Errors: ${JSON.stringify(errorCounts)}`);
           
           if (txCount % 150 === 0) {
             return sleep(60000);
@@ -155,7 +153,7 @@ export async function createAccount(
   const seed3 = randomBytes(32);
   const address2 = await deriveAddress(seed2, addressTree);
   const address3 = await deriveAddress(seed3, addressTree);
-  const proof2 = await rpc.getValidityProofDirect(undefined, [bn(address2.toBytes()), bn(address3.toBytes())]);
+  const proof2 = await rpc.getValidityProof(undefined, [bn(address2.toBytes()), bn(address3.toBytes())]);
   const params2: NewAddressParams = {
     seed: seed2,
     addressMerkleTreeRootIndex: proof2.rootIndices[0],

@@ -18,7 +18,9 @@
     "create-account-pulse": "ts-node src/create-account-pulse.ts",
     "create-account-with-lamports-pulse": "ts-node src/create-account-with-lamports-pulse.ts",
     "batch-address-load": "ts-node src/batch-address-load.ts",
+    "compress-decompress-load-test": "ts-node src/compress-decompress-load-test.ts",
     "address-load": "ts-node src/load/batch-address-load.ts",
+    "address-load-remote": "ts-node src/load/batch-address-load-remote.ts",
     "state-load": "ts-node src/load/batch-state-load.ts",
     "transfer-load": "ts-node src/load/transfer-load.ts"
   },

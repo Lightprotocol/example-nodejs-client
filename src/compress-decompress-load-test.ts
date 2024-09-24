@@ -1,7 +1,7 @@
 import { 
   bn, buildAndSignTx, createRpc, Rpc, LightSystemProgram,
-  CompressedTokenProgram
 } from "@lightprotocol/stateless.js";
+import { CompressedTokenProgram } from "@lightprotocol/compressed-token";
 import { 
   ComputeBudgetProgram, Keypair, PublicKey, SystemProgram,
   TransactionInstruction
@@ -81,7 +81,7 @@ async function sendTransaction(instructions: TransactionInstruction[]) {
 async function runCompressDecompressLoadTest() {
   console.log("Starting compress-decompress load test...");
   const mint = await createMint();
-  const recipients = Array(15).fill(null).map(() => Keypair.generate().publicKey);
+  const recipients = Array(1).fill(null).map(() =>new PublicKey("7FAR1Vgcwg7BX6XfUdWBdhMak6GnC2gokcZfrx2K4Qjx"));
 
   tpsRegulator.start();
 
@@ -94,13 +94,13 @@ async function runCompressDecompressLoadTest() {
       totalTxsSent++;
 
       // Decompress tokens for each recipient
-      for (const recipient of recipients) {
-        await decompressTokens(mint, recipient);
-        totalTxsSent++;
-      }
+      // for (const recipient of recipients) {
+      //   await decompressTokens(mint, recipient);
+      //   totalTxsSent++;
+      // }
 
-      console.log(`Transactions sent: ${totalTxsSent}`);
-      metricsLogger.log(`Tx: ${totalTxsSent}, Errors: ${JSON.stringify(errorCounts)}`);
+      // console.log(`Transactions sent: ${totalTxsSent}`);
+      // metricsLogger.log(`Tx: ${totalTxsSent}, Errors: ${JSON.stringify(errorCounts)}`);
 
     } catch (error) {
       console.error("Error in transaction:", error);
@@ -108,6 +108,7 @@ async function runCompressDecompressLoadTest() {
       errorCounts[errorCode] = (errorCounts[errorCode] || 0) + 1;
     }
 
+    throw new Error("stop");
     if (totalTxsSent % 100 === 0) {
       await sleep(30000);
     }
