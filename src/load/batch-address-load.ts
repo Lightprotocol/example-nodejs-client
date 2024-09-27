@@ -129,28 +129,7 @@ export async function createAccount(
   addressQueue = addressQueue ?? defaultTestStateTreeAccounts().addressQueue;
   const instructions = [];
 
-  // Create 1 account in the first instruction
-  const seed1 = randomBytes(32);
-  const address1 = await deriveAddress(seed1, addressTree);
-  // console.time(`getValidityProofDirect ${address1.toBase58()}`);
-  // const proof1 = await rpc.getValidityProofDirect(undefined, [bn(address1.toBytes())]);
-  // console.timeEnd(`getValidityProofDirect ${address1.toBase58()}`);
-  // const params1: NewAddressParams = {
-  //   seed: seed1,
-  //   addressMerkleTreeRootIndex: proof1.rootIndices[0],
-  //   addressMerkleTreePubkey: proof1.merkleTrees[0],
-  //   addressQueuePubkey: proof1.nullifierQueues[0],
-  // };
-  // const ix1 = await createAccounts({
-  //   payer: payer.publicKey,
-  //   newAddressParamsMultiple: [params1],
-  //   newAddresses: [Array.from(address1.toBytes())],
-  //   recentValidityProof: proof1.compressedProof,
-  //   outputStateTree,
-  // });
-  // instructions.push(ix1);
-
-  // Create 2 accounts in the second instruction
+  // Create 2 accounts in the instruction
   const seed2 = randomBytes(32);
   const seed3 = randomBytes(32);
   const address2 = await deriveAddress(seed2, addressTree);

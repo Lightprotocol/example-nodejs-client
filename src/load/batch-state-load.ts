@@ -87,13 +87,13 @@ async function compressAndDecompressTx(
 
 async function runCompressAndDecompressPulse() {
   await compressAndDecompressTx(connection, fromKeypair, MINT_ADDRESS);
-  // while (true) {
-  //   try {
+  while (true) {
+    try {
       
-  //   } catch (error) {
-  //     console.error("Error in transaction:", error);
-  //   }
-  // }
+    } catch (error) {
+      console.error("Error in transaction:", error);
+    }
+  }
 }
 
 runCompressAndDecompressPulse().catch(error => {
