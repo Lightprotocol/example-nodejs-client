@@ -13,7 +13,6 @@
     "lookup-table": "ts-node src/lookup-table.ts",
     "batch-compress": "ts-node src/batch-compress.ts",
     "mint-spl": "ts-node src/mint-spl.ts",
-    "debug-ix-too-large": "ts-node src/debug-ix-too-large.ts",
     "pulse": "ts-node src/transfer-pulse.ts",
     "create-account-pulse": "ts-node src/create-account-pulse.ts",
     "create-account-with-lamports-pulse": "ts-node src/create-account-with-lamports-pulse.ts"
