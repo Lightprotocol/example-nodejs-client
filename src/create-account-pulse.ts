@@ -1,14 +1,10 @@
 import { 
-  compress,
   createAccount,
   createRpc,
   LightSystemProgram,
   Rpc,
-  transfer,
 } from "@lightprotocol/stateless.js";
-import { SystemProgram, Transaction } from "@solana/web3.js";
 import { PAYER_KEYPAIR, RPC_ENDPOINT } from "./constants";
-import { PublicKey } from "@solana/web3.js";
 import { randomBytes } from "crypto";
 
 const fromKeypair = PAYER_KEYPAIR;

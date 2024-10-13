@@ -22,7 +22,7 @@ async function runCreateAccountWithLamportsPulse() {
     // console.log("compressed signature:", txId);
     while (true) {
       // Creat account with random address
-      const txId = await createAccountWithLamports(connection, fromKeypair, randomBytes(32), 10, LightSystemProgram.programId);
+      const txId = await createAccountWithLamports(connection, fromKeypair, [randomBytes(32)], 10, LightSystemProgram.programId);
       console.log(`Compressed Account Creation Success. Transaction Signature:`, txId);
 
       // Wait 5 seconds
