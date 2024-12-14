@@ -4,7 +4,7 @@ import {
   Rpc,
   transfer,
 } from "@lightprotocol/stateless.js";
-import { PAYER_KEYPAIR, RPC_ENDPOINT } from "./constants";
+import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
 
 
 const fromKeypair = PAYER_KEYPAIR;

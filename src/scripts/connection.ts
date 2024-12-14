@@ -1,4 +1,4 @@
-import { RPC_ENDPOINT } from "./constants";
+import { RPC_ENDPOINT } from "../constants";
 
 const stateless = require("@lightprotocol/stateless.js");
 

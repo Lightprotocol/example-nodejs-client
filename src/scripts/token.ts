@@ -1,7 +1,7 @@
 import { Rpc, confirmTx, createRpc } from "@lightprotocol/stateless.js";
 import { createMint, mintTo, transfer } from "@lightprotocol/compressed-token";
 import { Keypair } from "@solana/web3.js";
-import { PAYER_KEYPAIR } from "./constants";
+import { PAYER_KEYPAIR } from "../constants";
 const payer = PAYER_KEYPAIR;
 const tokenRecipient = Keypair.generate();
 

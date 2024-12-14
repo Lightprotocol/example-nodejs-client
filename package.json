@@ -6,16 +6,16 @@
   "type": "commonjs",
   "scripts": {
     "example": "npm run connection && npm run lamports && npm run token",
-    "extended": "ts-node src/extended.ts",
-    "lamports": "ts-node src/lamports.ts",
-    "token": "ts-node src/token.ts",
-    "connection": "ts-node src/connection.ts",
-    "lookup-table": "ts-node src/lookup-table.ts",
-    "batch-compress": "ts-node src/batch-compress.ts",
-    "mint-spl": "ts-node src/mint-spl.ts",
-    "pulse": "ts-node src/transfer-pulse.ts",
-    "create-account-pulse": "ts-node src/create-account-pulse.ts",
-    "create-account-with-lamports-pulse": "ts-node src/create-account-with-lamports-pulse.ts"
+    "extended": "ts-node src/scripts/extended.ts",
+    "lamports": "ts-node src/scripts/lamports.ts", 
+    "token": "ts-node src/scripts/token.ts",
+    "connection": "ts-node src/scripts/connection.ts",
+    "lookup-table": "ts-node src/scripts/lookup-table.ts",
+    "batch-compress": "ts-node src/scripts/batch-compress.ts",
+    "mint-spl": "ts-node src/scripts/mint-spl.ts",
+    "pulse": "ts-node src/scripts/transfer-pulse.ts",
+    "create-account-pulse": "ts-node src/scripts/create-account-pulse.ts",
+    "create-account-with-lamports-pulse": "ts-node src/scripts/create-account-with-lamports-pulse.ts"
   },
   "repository": {
     "type": "git",

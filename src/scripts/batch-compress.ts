@@ -1,5 +1,5 @@
 import * as web3 from "@solana/web3.js";
-import { RPC_ENDPOINT, PAYER_KEYPAIR, MINT_ADDRESS } from "./constants";
+import { RPC_ENDPOINT, PAYER_KEYPAIR, MINT_ADDRESS } from "../constants";
 import { CompressedTokenProgram } from "@lightprotocol/compressed-token";
 
 import {

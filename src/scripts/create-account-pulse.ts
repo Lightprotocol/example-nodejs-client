@@ -4,7 +4,7 @@ import {
   LightSystemProgram,
   Rpc,
 } from "@lightprotocol/stateless.js";
-import { PAYER_KEYPAIR, RPC_ENDPOINT } from "./constants";
+import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
 import { randomBytes } from "crypto";
 
 const fromKeypair = PAYER_KEYPAIR;
