@@ -12,24 +12,19 @@ import {
 import * as splToken from "@solana/spl-token";
 
 (async () => {
-  // Send the transaction
   try {
     const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
     const mintAddress = MINT_ADDRESS;
-
-    // Todo: Use wallet connection to create browser keypair using signed message
-    // and use it as payer and signer for all transactions.
     const payer = PAYER_KEYPAIR;
 
     // Get the source token account for the mint address
     const sourceTokenAccount = await splToken.getOrCreateAssociatedTokenAccount(
-      // @ts-ignore
       connection,
       payer,
       mintAddress,
       payer.publicKey
     );
-    // Airdrop recipients addresses
+    // Airdrop to random recipients addresses
     const airDropAddresses = [
       "GMPWaPPrCeZPse5kwSR3WUrqYAPrVZBSVwymqh7auNW7",
       "GySGrTgPtPfMtYoYTmwUdUDFwVJbFMfip7QZdhgXp8dy",
@@ -51,11 +46,11 @@ import * as splToken from "@solana/spl-token";
       "CY8QjRio1zd9bYWMKiVRrDbwVenf3JzsGf5km5zLgY9n",
       "CeHbdxgYifYhpB6sXGonKzmaejqEfq2ym5utTmB6XMVv",
       "4z1qss12DjUzGUkK1fFesqrUwrEVJJvzPMNkwqYnbAR5",
-    ].map(address => new web3.PublicKey(address));
+    ].map((address) => new web3.PublicKey(address));
 
     const amount = bn(111);
     const maxRecipientsPerInstruction = 5;
-    const maxIxs = 3; // empirically determined
+    const maxIxs = 3; // empirically determined (as of 12/15/2024)
     const instructions: web3.TransactionInstruction[] = [];
 
     instructions.push(
@@ -65,7 +60,10 @@ import * as splToken from "@solana/spl-token";
     let i = 0;
     let ixCount = 0;
     while (i < airDropAddresses.length && ixCount < maxIxs) {
-      const recipientBatch = airDropAddresses.slice(i, i + maxRecipientsPerInstruction);
+      const recipientBatch = airDropAddresses.slice(
+        i,
+        i + maxRecipientsPerInstruction
+      );
       const compressIx = await CompressedTokenProgram.compress({
         payer: payer.publicKey,
         owner: payer.publicKey,
@@ -79,12 +77,11 @@ import * as splToken from "@solana/spl-token";
       ixCount++;
     }
 
-    // Use zk-compression LUT
-    // https://www.zkcompression.com/developers/devnet-addresses#lookup-tables
+    // Use zk-compression LUT for your network
+    // https://www.zkcompression.com/developers/protocol-addresses-and-urls#lookup-tables
     // Default: DA35UyyzGTonmEjsbw1VGRACpKxbKUPS2DvrG193QYHC
     const lookupTableAddress = new web3.PublicKey(
-      // "DA35UyyzGTonmEjsbw1VGRACpKxbKUPS2DvrG193QYHC"
-      "qAJZMgnQJ8G6vA3WRcjD9Jan1wtKkaCFWLWskxJrR5V"
+      "qAJZMgnQJ8G6vA3WRcjD9Jan1wtKkaCFWLWskxJrR5V" // devnet
     );
 
     // Get the lookup table account
@@ -95,7 +92,6 @@ import * as splToken from "@solana/spl-token";
     // Sign the transaction with the payer and mint keypair
     const additionalSigners = dedupeSigner(payer, []);
 
-    // Get the latest blockhash
     const { blockhash } = await connection.getLatestBlockhash();
 
     const tx = buildAndSignTx(
@@ -108,13 +104,18 @@ import * as splToken from "@solana/spl-token";
 
     const serializedTx = tx.serialize();
     console.log(`Total transaction size: ${serializedTx.length} bytes`);
-    console.log(`Signatures size: ${tx.signatures.length * 64} bytes`);
-    console.log(`Message header size: ${tx.message.header.numRequiredSignatures + 3} bytes`);
-    console.log(`Accounts size: ${tx.message.staticAccountKeys.length * 32} bytes`);
-    console.log(`Recent blockhash size: 32 bytes`);
-    console.log(`Instructions size (without serialization overhead): ${instructions.reduce((acc, ix) => acc + ix.data.length, 0)} bytes`);
-    console.log(`Instructions size (with serialization overhead): ${tx.message.compiledInstructions.reduce((acc, ix) => acc + 1 + 1 + ix.accountKeyIndexes.length + ix.data.length, 0)} bytes`);
-    console.log(`Address table lookups size: ${tx.message.addressTableLookups.reduce((acc, lookup) => acc + 32 + 1 + lookup.writableIndexes.length + lookup.readonlyIndexes.length, 0)} bytes`);
+    console.log(
+      `Instructions size (without serialization overhead): ${instructions.reduce(
+        (acc, ix) => acc + ix.data.length,
+        0
+      )} bytes`
+    );
+    console.log(
+      `Instructions size (with serialization overhead): ${tx.message.compiledInstructions.reduce(
+        (acc, ix) => acc + 1 + 1 + ix.accountKeyIndexes.length + ix.data.length,
+        0
+      )} bytes`
+    );
 
     const simulate = await connection.simulateTransaction(tx);
 
@@ -124,6 +125,6 @@ import * as splToken from "@solana/spl-token";
       console.log("Simulation successful", simulate);
     }
   } catch (e) {
-    console.error(`Transaction failed to send`, e);
+    console.error(`Batch compression failed:`, e);
   }
 })();

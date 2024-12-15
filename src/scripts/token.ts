@@ -11,7 +11,7 @@ const connection: Rpc = createRpc();
 /// Uncomment to use Testnet:
 // const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
-const main = async () => {
+(async () => {
   /// airdrop lamports to pay fees
   await confirmTx(
     connection,
@@ -30,7 +30,7 @@ const main = async () => {
     9
   );
 
-  console.log(`create-mint  success! txId: ${transactionSignature}`);
+  console.log(`create-mint success! txId: ${transactionSignature}`);
 
   /// Mint compressed tokens
   const mintToTxId = await mintTo(
@@ -42,7 +42,7 @@ const main = async () => {
     1e7
   );
 
-  console.log(`mint-to      success! txId: ${mintToTxId}`);
+  console.log(`mint-to success! txId: ${mintToTxId}`);
 
   /// Transfer compressed tokens
   const transferTxId = await transfer(
@@ -54,7 +54,5 @@ const main = async () => {
     tokenRecipient.publicKey
   );
 
-  console.log(`transfer     success! txId: ${transferTxId}`);
-};
-
-main();
+  console.log(`transfer success! txId: ${transferTxId}`);
+})();
