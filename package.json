@@ -12,6 +12,7 @@
     "batch-compress": "ts-node src/scripts/batch-compress.ts",
     "mint-spl": "ts-node src/scripts/mint-spl.ts",
     "mint-spl-22": "ts-node src/scripts/mint-spl-22.ts",
+    "mint-spl-22-with-create-mint": "ts-node src/scripts/mint-spl-22-with-create-mint.ts",
     "pulse": "ts-node src/scripts/transfer-pulse.ts",
     "create-account-pulse": "ts-node src/scripts/create-account-pulse.ts",
     "create-account-with-lamports-pulse": "ts-node src/scripts/create-account-with-lamports-pulse.ts"
