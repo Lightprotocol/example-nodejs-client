@@ -9,7 +9,6 @@ import {
   mintTo as mintToSpl,
   TOKEN_2022_PROGRAM_ID,
   createInitializeMetadataPointerInstruction,
-  createInitializeMintInstruction,
   ExtensionType,
   getMintLen,
   LENGTH_SIZE,
@@ -56,27 +55,28 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
   const mintLamports = await connection.getMinimumBalanceForRentExemption(
     mintLen + metadataLen
   );
+
+  const [createMintAccountIx, initializeMintIx, createTokenPoolIx] =
+    await CompressedTokenProgram.createMint({
+      feePayer: payer.publicKey,
+      authority: payer.publicKey,
+      mint: mint.publicKey,
+      decimals,
+      freezeAuthority: null,
+      rentExemptBalance: mintLamports,
+      tokenProgramId: TOKEN_2022_PROGRAM_ID,
+      mintSize: mintLen,
+    });
+
   const mintTransaction = new Transaction().add(
-    SystemProgram.createAccount({
-      fromPubkey: payer.publicKey,
-      newAccountPubkey: mint.publicKey,
-      space: mintLen,
-      lamports: mintLamports,
-      programId: TOKEN_2022_PROGRAM_ID,
-    }),
+    createMintAccountIx,
     createInitializeMetadataPointerInstruction(
       mint.publicKey,
       payer.publicKey,
       mint.publicKey,
       TOKEN_2022_PROGRAM_ID
     ),
-    createInitializeMintInstruction(
-      mint.publicKey,
-      decimals,
-      payer.publicKey,
-      null,
-      TOKEN_2022_PROGRAM_ID
-    ),
+    initializeMintIx,
     createInitializeInstruction({
       programId: TOKEN_2022_PROGRAM_ID,
       mint: mint.publicKey,
@@ -87,12 +87,9 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
       mintAuthority: payer.publicKey,
       updateAuthority: payer.publicKey,
     }),
-    await CompressedTokenProgram.createTokenPool({
-      feePayer: payer.publicKey,
-      mint: mint.publicKey,
-      tokenProgramId: TOKEN_2022_PROGRAM_ID,
-    })
+    createTokenPoolIx
   );
+
   const txId = await sendAndConfirmTransaction(connection, mintTransaction, [
     payer,
     mint,

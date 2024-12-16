@@ -12,6 +12,7 @@
     "batch-compress": "ts-node src/scripts/batch-compress.ts",
     "mint-spl": "ts-node src/scripts/mint-spl.ts",
     "mint-spl-22": "ts-node src/scripts/mint-spl-22.ts",
+    "mint-spl-22-with-create-mint": "ts-node src/scripts/mint-spl-22-with-create-mint.ts",
     "pulse": "ts-node src/scripts/transfer-pulse.ts",
     "create-account-pulse": "ts-node src/scripts/create-account-pulse.ts",
     "create-account-with-lamports-pulse": "ts-node src/scripts/create-account-with-lamports-pulse.ts"
@@ -29,8 +30,8 @@
   "homepage": "https://github.com/Lightprotocol/example-nodejs-client#readme",
   "dependencies": {
     "@coral-xyz/anchor": "0.29.0",
-    "@lightprotocol/compressed-token": "0.17.0",
-    "@lightprotocol/stateless.js": "0.17.0",
+    "@lightprotocol/compressed-token": "0.17.1",
+    "@lightprotocol/stateless.js": "0.17.1",
     "@solana/spl-token": "^0.3.11",
     "@solana/web3.js": "1.95.3",
     "@types/node": "^20.12.7",
