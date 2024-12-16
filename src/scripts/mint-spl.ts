@@ -4,13 +4,10 @@ import {
   getOrCreateAssociatedTokenAccount,
   mintTo as mintToSpl,
 } from "@solana/spl-token";
-import { PAYER_KEYPAIR, RPC_ENDPOINT } from "./constants";
-import { Connection, PublicKey } from "@solana/web3.js";
-
+import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
 
 const payer = PAYER_KEYPAIR;
 const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
-// const connection: Rpc = createRpc();
 
 const main = async () => {
   /// airdrop lamports to pay fees
@@ -27,9 +24,7 @@ const main = async () => {
   );
   console.log(`create-mint  success! txId: ${transactionSignature}`);
 
-  // connection.getcompressedAccountsByOwnerWithCursor
   // Get ATA
-  // const mint = new PublicKey("9gSxQyxRLW6BaVhWYSjKyetnBaUvhqwBnTiShzBS7CJt");
   const ata = await getOrCreateAssociatedTokenAccount(
     connection,
     payer,
@@ -39,14 +34,7 @@ const main = async () => {
 
   console.log(`ATA: ${ata.address}`);
   /// Mint SPL
-  await mintToSpl(
-    connection,
-    payer,
-    mint,
-    ata.address,
-    payer.publicKey,
-    1e5
-  );
+  await mintToSpl(connection, payer, mint, ata.address, payer.publicKey, 1e5);
 };
 
 main();

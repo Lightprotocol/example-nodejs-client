@@ -1,6 +1,6 @@
 import { Rpc, confirmTx, createRpc } from "@lightprotocol/stateless.js";
 import { createTokenProgramLookupTable } from "@lightprotocol/compressed-token";
-import { PAYER_KEYPAIR, RPC_ENDPOINT } from "./constants";
+import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
 
 const payer = PAYER_KEYPAIR;
 const connection: Rpc = createRpc();
