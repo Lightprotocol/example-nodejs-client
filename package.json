@@ -5,7 +5,7 @@
   "main": "node src/connection.ts",
   "type": "commonjs",
   "scripts": {
-    "lamports": "ts-node src/scripts/lamports.ts", 
+    "lamports": "ts-node src/scripts/lamports.ts",
     "token": "ts-node src/scripts/token.ts",
     "connection": "ts-node src/scripts/connection.ts",
     "lookup-table": "ts-node src/scripts/lookup-table.ts",
@@ -29,15 +29,18 @@
   },
   "homepage": "https://github.com/Lightprotocol/example-nodejs-client#readme",
   "dependencies": {
-    "@coral-xyz/anchor": "0.29.0",
-    "@lightprotocol/compressed-token": "0.17.0",
-    "@lightprotocol/stateless.js": "0.17.0",
-    "@solana/spl-token": "^0.3.11",
-    "@solana/web3.js": "1.95.3",
+    "@lightprotocol/compressed-token": "0.18.0",
+    "@lightprotocol/stateless.js": "0.18.0",
+    "@solana/spl-token": "0.3.9",
+    "@solana/spl-token-metadata": "^0.1.6",
+    "@solana/web3.js": "1.73.5",
     "@types/node": "^20.12.7",
     "bs58": "^6.0.0",
     "dotenv": "^16.4.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
+  },
+  "overrides": {
+    "rpc-websockets": "7.5.1"
   }
 }
