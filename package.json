@@ -12,11 +12,11 @@
     "batch-compress": "ts-node src/scripts/batch-compress.ts",
     "mint-spl": "ts-node src/scripts/mint-spl.ts",
     "mint-spl-22": "ts-node src/scripts/mint-spl-22.ts",
-    "mint-spl-22-debug": "ts-node src/internal/mint-spl-22-debug.ts",
+    "mint-spl-22-manual": "ts-node src/scripts/mint-spl-22-manual.ts",
     "pulse": "ts-node src/internal/transfer-pulse.ts",
     "create-account-pulse": "ts-node src/internal/create-account-pulse.ts",
     "create-account-with-lamports-pulse": "ts-node src/internal/create-account-with-lamports-pulse.ts",
-    "test": "npm run lamports && npm run token && npm run connection && npm run batch-compress && npm run mint-spl && npm run mint-spl-22"
+    "test": "npm run lamports && npm run token && npm run connection && npm run batch-compress && npm run mint-spl && npm run mint-spl-22 && npm run mint-spl-22-manual"
   },
   "repository": {
     "type": "git",
@@ -34,14 +34,11 @@
     "@lightprotocol/stateless.js": "0.18.0",
     "@solana/spl-token": "0.3.9",
     "@solana/spl-token-metadata": "^0.1.6",
-    "@solana/web3.js": "1.73.5",
+    "@solana/web3.js": "^1.98.0",
     "@types/node": "^20.12.7",
     "bs58": "^6.0.0",
     "dotenv": "^16.4.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
-  },
-  "overrides": {
-    "rpc-websockets": "7.5.1"
   }
 }

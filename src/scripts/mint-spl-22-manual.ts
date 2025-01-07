@@ -1,7 +1,13 @@
-import { Rpc, confirmTx, createRpc } from "@lightprotocol/stateless.js";
+import {
+  Rpc,
+  confirmTx,
+  createRpc,
+  sendAndConfirmTx,
+} from "@lightprotocol/stateless.js";
 import {
   compress,
   CompressedTokenProgram,
+  CreateMintParams,
   transfer,
 } from "@lightprotocol/compressed-token";
 import {
@@ -21,6 +27,8 @@ import {
   sendAndConfirmTransaction,
   SystemProgram,
   Transaction,
+  TransactionMessage,
+  VersionedTransaction,
 } from "@solana/web3.js";
 import {
   createInitializeInstruction,
@@ -56,7 +64,8 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
   const mintLamports = await connection.getMinimumBalanceForRentExemption(
     mintLen + metadataLen
   );
-  const mintTransaction = new Transaction().add(
+
+  const mintIxs = [
     SystemProgram.createAccount({
       fromPubkey: payer.publicKey,
       newAccountPubkey: mint.publicKey,
@@ -91,13 +100,22 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
       feePayer: payer.publicKey,
       mint: mint.publicKey,
       tokenProgramId: TOKEN_2022_PROGRAM_ID,
-    })
-  );
-  const txId = await sendAndConfirmTransaction(connection, mintTransaction, [
-    payer,
-    mint,
-  ]);
+    }),
+  ];
+
+  const messageV0 = new TransactionMessage({
+    payerKey: payer.publicKey,
+    recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+    instructions: mintIxs,
+  }).compileToV0Message();
+
+  const mintTransaction = new VersionedTransaction(messageV0);
+  mintTransaction.sign([payer, mint]);
+
+  const txId = await sendAndConfirmTx(connection, mintTransaction);
+
   console.log(`txId: ${txId}`);
+
   const ata = await getOrCreateAssociatedTokenAccount(
     connection,
     payer,
