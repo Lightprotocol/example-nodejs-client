@@ -1,4 +1,4 @@
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
+import bs58 from "bs58";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import dotenv from "dotenv";
 dotenv.config();

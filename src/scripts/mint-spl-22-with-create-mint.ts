@@ -1,9 +1,5 @@
 import { Rpc, createRpc, sendAndConfirmTx } from "@lightprotocol/stateless.js";
-import {
-  compress,
-  CompressedTokenProgram,
-  transfer,
-} from "@lightprotocol/compressed-token";
+
 import {
   getOrCreateAssociatedTokenAccount,
   mintTo as mintToSpl,
@@ -25,6 +21,11 @@ import {
   pack,
   TokenMetadata,
 } from "@solana/spl-token-metadata";
+import {
+  compress,
+  CompressedTokenProgram,
+  transfer,
+} from "@lightprotocol/compressed-token";
 
 const payer = PAYER_KEYPAIR;
 const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
