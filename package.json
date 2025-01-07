@@ -12,10 +12,11 @@
     "batch-compress": "ts-node src/scripts/batch-compress.ts",
     "mint-spl": "ts-node src/scripts/mint-spl.ts",
     "mint-spl-22": "ts-node src/scripts/mint-spl-22.ts",
-    "mint-spl-22-with-create-mint": "ts-node src/scripts/mint-spl-22-with-create-mint.ts",
-    "pulse": "ts-node src/scripts/transfer-pulse.ts",
-    "create-account-pulse": "ts-node src/scripts/create-account-pulse.ts",
-    "create-account-with-lamports-pulse": "ts-node src/scripts/create-account-with-lamports-pulse.ts"
+    "mint-spl-22-debug": "ts-node src/internal/mint-spl-22-debug.ts",
+    "pulse": "ts-node src/internal/transfer-pulse.ts",
+    "create-account-pulse": "ts-node src/internal/create-account-pulse.ts",
+    "create-account-with-lamports-pulse": "ts-node src/internal/create-account-with-lamports-pulse.ts",
+    "test": "npm run lamports && npm run token && npm run connection && npm run batch-compress && npm run mint-spl && npm run mint-spl-22"
   },
   "repository": {
     "type": "git",
