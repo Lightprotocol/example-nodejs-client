@@ -13,4 +13,4 @@ if (!PAYER_KEYPAIR)
   throw new Error("Please set PAYER_KEYPAIR as bs58 string in .env");
 if (!MINT_ADDRESS) throw new Error("Please set MINT_ADDRESS in .env");
 
-console.log("PAYER_KEYPAIR", PAYER_KEYPAIR.publicKey.toString());
+console.log("PAYER PUBLIC KEY:", PAYER_KEYPAIR.publicKey.toString());

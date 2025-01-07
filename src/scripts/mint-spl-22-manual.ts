@@ -1,10 +1,21 @@
-import { Rpc, createRpc, sendAndConfirmTx } from "@lightprotocol/stateless.js";
-
+import {
+  Rpc,
+  confirmTx,
+  createRpc,
+  sendAndConfirmTx,
+} from "@lightprotocol/stateless.js";
+import {
+  compress,
+  CompressedTokenProgram,
+  CreateMintParams,
+  transfer,
+} from "@lightprotocol/compressed-token";
 import {
   getOrCreateAssociatedTokenAccount,
   mintTo as mintToSpl,
   TOKEN_2022_PROGRAM_ID,
   createInitializeMetadataPointerInstruction,
+  createInitializeMintInstruction,
   ExtensionType,
   getMintLen,
   LENGTH_SIZE,
@@ -13,6 +24,9 @@ import {
 import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
 import {
   Keypair,
+  sendAndConfirmTransaction,
+  SystemProgram,
+  Transaction,
   TransactionMessage,
   VersionedTransaction,
 } from "@solana/web3.js";
@@ -21,11 +35,6 @@ import {
   pack,
   TokenMetadata,
 } from "@solana/spl-token-metadata";
-import {
-  compress,
-  CompressedTokenProgram,
-  transfer,
-} from "@lightprotocol/compressed-token";
 
 const payer = PAYER_KEYPAIR;
 const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
@@ -56,27 +65,27 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
     mintLen + metadataLen
   );
 
-  const [createMintAccountIx, initializeMintIx, createTokenPoolIx] =
-    await CompressedTokenProgram.createMint({
-      feePayer: payer.publicKey,
-      authority: payer.publicKey,
-      mint: mint.publicKey,
-      decimals,
-      freezeAuthority: null,
-      rentExemptBalance: mintLamports,
-      tokenProgramId: TOKEN_2022_PROGRAM_ID,
-      mintSize: mintLen,
-    });
-
-  const instructions = [
-    createMintAccountIx,
+  const mintIxs = [
+    SystemProgram.createAccount({
+      fromPubkey: payer.publicKey,
+      newAccountPubkey: mint.publicKey,
+      space: mintLen,
+      lamports: mintLamports,
+      programId: TOKEN_2022_PROGRAM_ID,
+    }),
     createInitializeMetadataPointerInstruction(
       mint.publicKey,
       payer.publicKey,
       mint.publicKey,
       TOKEN_2022_PROGRAM_ID
     ),
-    initializeMintIx,
+    createInitializeMintInstruction(
+      mint.publicKey,
+      decimals,
+      payer.publicKey,
+      null,
+      TOKEN_2022_PROGRAM_ID
+    ),
     createInitializeInstruction({
       programId: TOKEN_2022_PROGRAM_ID,
       mint: mint.publicKey,
@@ -87,13 +96,17 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
       mintAuthority: payer.publicKey,
       updateAuthority: payer.publicKey,
     }),
-    createTokenPoolIx,
+    await CompressedTokenProgram.createTokenPool({
+      feePayer: payer.publicKey,
+      mint: mint.publicKey,
+      tokenProgramId: TOKEN_2022_PROGRAM_ID,
+    }),
   ];
 
   const messageV0 = new TransactionMessage({
     payerKey: payer.publicKey,
     recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
-    instructions,
+    instructions: mintIxs,
   }).compileToV0Message();
 
   const mintTransaction = new VersionedTransaction(messageV0);
@@ -102,6 +115,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
   const txId = await sendAndConfirmTx(connection, mintTransaction);
 
   console.log(`txId: ${txId}`);
+
   const ata = await getOrCreateAssociatedTokenAccount(
     connection,
     payer,

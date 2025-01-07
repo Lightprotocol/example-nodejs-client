@@ -1,22 +1,22 @@
 import { Rpc, confirmTx, createRpc } from "@lightprotocol/stateless.js";
 import { createMint, mintTo, transfer } from "@lightprotocol/compressed-token";
 import { Keypair } from "@solana/web3.js";
-import { PAYER_KEYPAIR } from "../constants";
+import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
 const payer = PAYER_KEYPAIR;
 const tokenRecipient = Keypair.generate();
 
 /// Localnet, expects `light test-validator` to be running:
-const connection: Rpc = createRpc();
+// const connection: Rpc = createRpc();
 
-/// Uncomment to use Testnet:
-// const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
+/// Uncomment to use env:
+const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT, RPC_ENDPOINT);
 
 (async () => {
   /// airdrop lamports to pay fees
-  await confirmTx(
-    connection,
-    await connection.requestAirdrop(payer.publicKey, 1e7)
-  );
+  // await confirmTx(
+  //   connection,
+  //   await connection.requestAirdrop(payer.publicKey, 1e7)
+  // );
 
   await confirmTx(
     connection,
