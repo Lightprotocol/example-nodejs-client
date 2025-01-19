@@ -19,6 +19,8 @@
     "create-account-pulse": "ts-node src/internal/create-account-pulse.ts",
     "create-account-with-lamports-pulse": "ts-node src/internal/create-account-with-lamports-pulse.ts",
     "airdrop": "ts-node src/scripts/airdrop/airdrop.ts",
+    "transfer": "ts-node src/scripts/transfer.ts",
+    "compress": "ts-node src/scripts/compress.ts",
     "test": "npm run lamports && npm run token && npm run connection && npm run batch-compress && npm run mint-spl && npm run mint-spl-22 && npm run mint-spl-22-manual"
   },
   "repository": {
@@ -33,8 +35,8 @@
   },
   "homepage": "https://github.com/Lightprotocol/example-nodejs-client#readme",
   "dependencies": {
-    "@lightprotocol/compressed-token": "0.20.3",
-    "@lightprotocol/stateless.js": "0.20.3",
+    "@lightprotocol/compressed-token": "0.20.9",
+    "@lightprotocol/stateless.js": "0.20.9",
     "@solana/spl-token": "0.3.9",
     "@solana/spl-token-metadata": "^0.1.6",
     "@solana/web3.js": "^1.98.0",

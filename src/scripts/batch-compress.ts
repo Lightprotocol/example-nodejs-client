@@ -9,6 +9,7 @@ import {
   dedupeSigner,
   pickRandomTreeAndQueue,
   Rpc,
+  sendAndConfirmTx,
 } from "@lightprotocol/stateless.js";
 import * as splToken from "@solana/spl-token";
 
@@ -131,6 +132,9 @@ import * as splToken from "@solana/spl-token";
     } else {
       console.log("Simulation successful", simulate);
     }
+    // Uncomment to send the transaction:
+    // const txId = await sendAndConfirmTx(connection, tx);
+    // console.log(`txId: ${txId}`);
   } catch (e) {
     console.error(`Batch compression failed:`, e);
   }
