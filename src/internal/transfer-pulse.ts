@@ -3,6 +3,7 @@ import {
   compress,
   createRpc,
   Rpc,
+  sleep,
   transfer,
 } from "@lightprotocol/stateless.js";
 import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
@@ -26,13 +27,13 @@ const getRandTree = () => {
   return trees[Math.floor(Math.random() * trees.length)];
 };
 
-const batchSize = 100;
+const batchSize = 10;
 (async () => {
   try {
     const compressedTxId = await compress(
       connection,
       fromKeypair,
-      bn(10),
+      bn(1e5),
       fromKeypair.publicKey,
       new PublicKey(getRandTree())
     );
@@ -40,11 +41,13 @@ const batchSize = 100;
       console.log("Compressed TxId", compressedTxId);
       const transferPromises = [];
       for (let i = 0; i < batchSize; i++) {
+        console.log("sent", i);
+        await sleep(100);
         transferPromises.push(
           transfer(
             connection,
             fromKeypair,
-            10,
+            1,
             fromKeypair,
             fromKeypair.publicKey,
             new PublicKey(getRandTree()),
@@ -63,7 +66,7 @@ const batchSize = 100;
       });
 
       // Wait 1 second
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await sleep(2000);
     }
   } catch (error) {
     console.error("An error occurred:", error);
