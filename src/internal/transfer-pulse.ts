@@ -1,5 +1,12 @@
-import { createRpc, Rpc, transfer } from "@lightprotocol/stateless.js";
+import {
+  bn,
+  compress,
+  createRpc,
+  Rpc,
+  transfer,
+} from "@lightprotocol/stateless.js";
 import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
+import { PublicKey } from "@solana/web3.js";
 
 const fromKeypair = PAYER_KEYPAIR;
 const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
@@ -7,6 +14,14 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 (async () => {
   try {
     while (true) {
+      const compressedTxId = await compress(
+        connection,
+        fromKeypair,
+        bn(10),
+        fromKeypair.publicKey,
+        new PublicKey("smt3AFtReRGVcrP11D6bSLEaKdUmrGfaTNowMVccJeu")
+      );
+      console.log("Compressed TxId", compressedTxId);
       // Transfer 10 lamports to self
       const txId = await transfer(
         connection,
@@ -14,7 +29,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
         10,
         fromKeypair,
         fromKeypair.publicKey,
-        undefined,
+        new PublicKey("smt3AFtReRGVcrP11D6bSLEaKdUmrGfaTNowMVccJeu"),
         {
           skipPreflight: false,
         }
