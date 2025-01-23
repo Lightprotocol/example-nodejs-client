@@ -24,8 +24,25 @@ const INITIAL_SOL_PER_KEYPAIR = 0.04;
 const MIN_SOL_PER_KEYPAIR = 0.02;
 const COMPRESS_LAMPORTS = bn(1e5);
 const COMPRESSED_TRANSFER_AMOUNT = 1;
-const ITERATIONS = 1000; // Number of iterations to run
+const ITERATIONS = 50; // Number of iterations to run
 const KEYPAIRS_DIR = './keypairs';
+
+async function retryWithNewBlockhash(transaction: Transaction, signers: Keypair[], maxAttempts = 10): Promise<string> {
+    let lastError;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        try {
+            const latestBlockhash = await connection.getLatestBlockhash();
+            transaction.recentBlockhash = latestBlockhash.blockhash;
+            return await sendAndConfirmTransaction(connection, transaction, signers);
+        } catch (err) {
+            lastError = err;
+            if (attempt < maxAttempts - 1) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+    }
+    throw lastError;
+}
 
 async function loadOrCreateKeypairs(): Promise<Keypair[]> {
     if (!fs.existsSync(KEYPAIRS_DIR)) {
@@ -63,11 +80,7 @@ async function returnFundsToMain(keypair: Keypair): Promise<void> {
             }),
         );
 
-        const signature = await sendAndConfirmTransaction(
-            connection,
-            transaction,
-            [keypair],
-        );
+        const signature = await retryWithNewBlockhash(transaction, [keypair]);
         console.log(
             `Returned ${balance / LAMPORTS_PER_SOL} SOL from ${keypair.publicKey.toBase58()} ` +
             `to main wallet. Tx: ${signature}`,
@@ -77,10 +90,8 @@ async function returnFundsToMain(keypair: Keypair): Promise<void> {
 
 (async () => {
     try {
-        // 1. Load or create keypairs
         const newKeypairs = await loadOrCreateKeypairs();
 
-        // 2. Fund new keypairs if needed
         for (let i = 0; i < batchSize; i++) {
             const balance = await connection.getBalance(newKeypairs[i].publicKey);
             if (balance < INITIAL_SOL_PER_KEYPAIR * LAMPORTS_PER_SOL) {
@@ -91,11 +102,7 @@ async function returnFundsToMain(keypair: Keypair): Promise<void> {
                         lamports: Math.floor(INITIAL_SOL_PER_KEYPAIR * LAMPORTS_PER_SOL) - balance,
                     }),
                 );
-                const txSignature = await sendAndConfirmTransaction(
-                    connection,
-                    transaction,
-                    [fromKeypair],
-                );
+                const txSignature = await retryWithNewBlockhash(transaction, [fromKeypair]);
                 console.log(
                     `Topped up ${newKeypairs[i].publicKey.toBase58()} to ${INITIAL_SOL_PER_KEYPAIR} SOL. ` +
                     `Tx: ${txSignature}`,
@@ -103,7 +110,6 @@ async function returnFundsToMain(keypair: Keypair): Promise<void> {
             }
         }
 
-        // 3. Main loop with N iterations
         for (let iteration = 0; iteration < ITERATIONS; iteration++) {
             console.log(`${iteration + 1}/${ITERATIONS}`);
 
@@ -112,43 +118,44 @@ async function returnFundsToMain(keypair: Keypair): Promise<void> {
 
             const compressAndTransferPromises = newKeypairs.map(
                 async (senderKp, i) => {
-                    const balance = await connection.getBalance(senderKp.publicKey);
-                    const thresholdLamports = MIN_SOL_PER_KEYPAIR * LAMPORTS_PER_SOL;
+                    try {
+                        const balance = await connection.getBalance(senderKp.publicKey);
+                        const thresholdLamports = MIN_SOL_PER_KEYPAIR * LAMPORTS_PER_SOL;
 
-                    if (balance < thresholdLamports) {
-                        const topUpLamports = thresholdLamports - balance;
-                        const topUpTx = new Transaction().add(
-                            SystemProgram.transfer({
-                                fromPubkey: fromKeypair.publicKey,
-                                toPubkey: senderKp.publicKey,
-                                lamports: topUpLamports,
-                            }),
+                        if (balance < thresholdLamports) {
+                            const topUpLamports = thresholdLamports - balance;
+                            const topUpTx = new Transaction().add(
+                                SystemProgram.transfer({
+                                    fromPubkey: fromKeypair.publicKey,
+                                    toPubkey: senderKp.publicKey,
+                                    lamports: topUpLamports,
+                                }),
+                            );
+                            await retryWithNewBlockhash(topUpTx, [fromKeypair]);
+                        }
+
+                        const compressTxId = await compress(
+                            connection,
+                            senderKp,
+                            COMPRESS_LAMPORTS,
+                            senderKp.publicKey,
+                            tree,
                         );
-                        await sendAndConfirmTransaction(connection, topUpTx, [fromKeypair]);
+                        console.log(`Compressed ${COMPRESS_LAMPORTS} lamports for ${senderKp.publicKey.toBase58()}. Tx: ${compressTxId}`);
+
+                        await transfer(
+                            connection,
+                            senderKp,
+                            COMPRESSED_TRANSFER_AMOUNT,
+                            senderKp,
+                            newKeypairs[(i + 1) % batchSize].publicKey,
+                            tree,
+                            { skipPreflight: false },
+                        );
+                        console.log(`Transferred ${COMPRESSED_TRANSFER_AMOUNT} lamports from ${senderKp.publicKey.toBase58()} to ${newKeypairs[(i + 1) % batchSize].publicKey.toBase58()}`);
+                    } catch (error) {
+                        console.error(`Error in operation for keypair ${i}:`, error);
                     }
-
-                    const compressTxId = await compress(
-                        connection,
-                        senderKp,
-                        COMPRESS_LAMPORTS,
-                        senderKp.publicKey,
-                        tree,
-                    );
-                    console.log(`Compressed ${COMPRESS_LAMPORTS} lamports for ${senderKp.publicKey.toBase58()}. Tx: ${compressTxId}`);
-
-                    const recipientIndex = (i + 1) % batchSize;
-                    const recipientPubkey = newKeypairs[recipientIndex].publicKey;
-
-                    await transfer(
-                        connection,
-                        senderKp,
-                        COMPRESSED_TRANSFER_AMOUNT,
-                        senderKp,
-                        recipientPubkey,
-                        tree,
-                        { skipPreflight: false },
-                    );
-                    console.log(`Transferred ${COMPRESSED_TRANSFER_AMOUNT} SOL from ${senderKp.publicKey.toBase58()} to ${recipientPubkey.toBase58()}`);
                 },
             );
 
