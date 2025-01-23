@@ -1,154 +1,167 @@
 import {
-  bn,
-  compress,
-  createRpc,
-  pickRandomTreeAndQueue,
-  Rpc,
-  sleep,
-  transfer,
+    bn,
+    compress,
+    createRpc,
+    pickRandomTreeAndQueue,
+    transfer,
 } from "@lightprotocol/stateless.js";
 import {
-  Keypair,
-  PublicKey,
-  SystemProgram,
-  LAMPORTS_PER_SOL,
-  sendAndConfirmTransaction,
-  Transaction,
+    Keypair,
+    SystemProgram,
+    LAMPORTS_PER_SOL,
+    sendAndConfirmTransaction,
+    Transaction,
 } from "@solana/web3.js";
 import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
+import * as fs from 'fs';
+import * as path from 'path';
 
-// The "main" keypair that initially funds everyone.
 const fromKeypair = PAYER_KEYPAIR;
-const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
+const connection = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
-// Number of new keypairs to create & fund:
-const batchSize = 50;
-// How much SOL each new keypair gets initially (one-time fund):
-const INITIAL_SOL_PER_KEYPAIR = 0.1;
-// Minimum SOL to maintain in each keypair before compressing again:
+const batchSize = 15;
+const INITIAL_SOL_PER_KEYPAIR = 0.04;
 const MIN_SOL_PER_KEYPAIR = 0.02;
-
-// The lamports needed to compress each iteration (e.g. ~0.0001 SOL).
 const COMPRESS_LAMPORTS = bn(1e5);
-// The compressed SOL to transfer each iteration (1 "light unit").
 const COMPRESSED_TRANSFER_AMOUNT = 1;
+const ITERATIONS = 1000; // Number of iterations to run
+const KEYPAIRS_DIR = './keypairs';
+
+async function loadOrCreateKeypairs(): Promise<Keypair[]> {
+    if (!fs.existsSync(KEYPAIRS_DIR)) {
+        fs.mkdirSync(KEYPAIRS_DIR);
+    }
+
+    const keypairs: Keypair[] = [];
+
+    for (let i = 0; i < batchSize; i++) {
+        const keypairPath = path.join(KEYPAIRS_DIR, `keypair_${i}.json`);
+
+        if (fs.existsSync(keypairPath)) {
+            const secretKey = new Uint8Array(JSON.parse(fs.readFileSync(keypairPath, 'utf-8')));
+            keypairs.push(Keypair.fromSecretKey(secretKey));
+            console.log(`Loaded keypair ${i} from file`);
+        } else {
+            const keypair = Keypair.generate();
+            fs.writeFileSync(keypairPath, JSON.stringify(Array.from(keypair.secretKey)));
+            keypairs.push(keypair);
+            console.log(`Generated and saved new keypair ${i}`);
+        }
+    }
+
+    return keypairs;
+}
+
+async function returnFundsToMain(keypair: Keypair): Promise<void> {
+    const balance = await connection.getBalance(keypair.publicKey);
+    if (balance > 0) {
+        const transaction = new Transaction().add(
+            SystemProgram.transfer({
+                fromPubkey: keypair.publicKey,
+                toPubkey: fromKeypair.publicKey,
+                lamports: balance - 5000,
+            }),
+        );
+
+        const signature = await sendAndConfirmTransaction(
+            connection,
+            transaction,
+            [keypair],
+        );
+        console.log(
+            `Returned ${balance / LAMPORTS_PER_SOL} SOL from ${keypair.publicKey.toBase58()} ` +
+            `to main wallet. Tx: ${signature}`,
+        );
+    }
+}
 
 (async () => {
-  try {
-    // ------------------------------------------------------------------
-    // 1) Create & Fund N = batchSize New Keypairs
-    // ------------------------------------------------------------------
-    const newKeypairs: Keypair[] = [];
-    for (let i = 0; i < batchSize; i++) {
-      newKeypairs.push(Keypair.generate());
-    }
+    try {
+        // 1. Load or create keypairs
+        const newKeypairs = await loadOrCreateKeypairs();
 
-    console.log(`Created ${batchSize} new keypairs.\nFunding each with ${INITIAL_SOL_PER_KEYPAIR} SOL...`);
-
-    for (let i = 0; i < batchSize; i++) {
-      const transaction = new Transaction().add(
-          SystemProgram.transfer({
-            fromPubkey: fromKeypair.publicKey,
-            toPubkey: newKeypairs[i].publicKey,
-            lamports: Math.floor(INITIAL_SOL_PER_KEYPAIR * LAMPORTS_PER_SOL),
-          })
-      );
-      const txSignature = await sendAndConfirmTransaction(
-          connection,
-          transaction,
-          [fromKeypair]
-      );
-      console.log(
-          `Funded newKeypair[${i}] (${newKeypairs[i].publicKey.toBase58()}) ` +
-          `with ~${INITIAL_SOL_PER_KEYPAIR} SOL. Tx: ${txSignature}`
-      );
-    }
-
-    console.log("\nAll new keypairs funded. Entering main loop...\n");
-
-    // ------------------------------------------------------------------
-    // 2) Infinite Loop
-    // ------------------------------------------------------------------
-    while (true) {
-      // a) Fetch the latest active state trees and pick one randomly
-      const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
-      const { tree } = pickRandomTreeAndQueue(activeStateTrees);
-      console.log("Picked random output state tree:", tree.toBase58());
-
-      // b) For each new keypair: ensure minimum SOL, then compress, then transfer
-      const compressAndTransferPromises = newKeypairs.map(async (senderKp, i) => {
-        // ----------------------------------------------------------------------
-        // i) Ensure this keypair has enough on-chain SOL
-        // ----------------------------------------------------------------------
-        const balance = await connection.getBalance(senderKp.publicKey);
-        const thresholdLamports = MIN_SOL_PER_KEYPAIR * LAMPORTS_PER_SOL;
-
-        if (balance < thresholdLamports) {
-          // Top up from fromKeypair
-          const topUpLamports = thresholdLamports - balance;
-          const topUpTx = new Transaction().add(
-              SystemProgram.transfer({
-                fromPubkey: fromKeypair.publicKey,
-                toPubkey: senderKp.publicKey,
-                lamports: topUpLamports,
-              })
-          );
-          const topUpSig = await sendAndConfirmTransaction(
-              connection,
-              topUpTx,
-              [fromKeypair]
-          );
-          console.log(
-              `Keypair[${i}] was below ${MIN_SOL_PER_KEYPAIR} SOL. ` +
-              `Topped up ~${topUpLamports / LAMPORTS_PER_SOL} SOL. Tx: ${topUpSig}`
-          );
+        // 2. Fund new keypairs if needed
+        for (let i = 0; i < batchSize; i++) {
+            const balance = await connection.getBalance(newKeypairs[i].publicKey);
+            if (balance < INITIAL_SOL_PER_KEYPAIR * LAMPORTS_PER_SOL) {
+                const transaction = new Transaction().add(
+                    SystemProgram.transfer({
+                        fromPubkey: fromKeypair.publicKey,
+                        toPubkey: newKeypairs[i].publicKey,
+                        lamports: Math.floor(INITIAL_SOL_PER_KEYPAIR * LAMPORTS_PER_SOL) - balance,
+                    }),
+                );
+                const txSignature = await sendAndConfirmTransaction(
+                    connection,
+                    transaction,
+                    [fromKeypair],
+                );
+                console.log(
+                    `Topped up ${newKeypairs[i].publicKey.toBase58()} to ${INITIAL_SOL_PER_KEYPAIR} SOL. ` +
+                    `Tx: ${txSignature}`,
+                );
+            }
         }
 
-        // ----------------------------------------------------------------------
-        // ii) Compress some on-chain SOL -> compressed domain
-        // ----------------------------------------------------------------------
-        const compressTxId = await compress(
-            connection,
-            senderKp,            // authority = "senderKp"
-            COMPRESS_LAMPORTS,   // lamports to compress (0.0001 SOL)
-            senderKp.publicKey,  // compressed "recipient" = the same key
-            tree
-        );
-        console.log(
-            `Keypair[${i}] compressed ~${COMPRESS_LAMPORTS.toString()} lamports. Tx: ${compressTxId}`
-        );
+        // 3. Main loop with N iterations
+        for (let iteration = 0; iteration < ITERATIONS; iteration++) {
+            console.log(`${iteration + 1}/${ITERATIONS}`);
 
-        // ----------------------------------------------------------------------
-        // iii) Transfer from this keypair to the "next" one in compressed domain
-        // ----------------------------------------------------------------------
-        const recipientIndex = (i + 1) % batchSize;
-        const recipientPubkey = newKeypairs[recipientIndex].publicKey;
-        const transferTxId = await transfer(
-            connection,
-            senderKp,            // fee payer & authority
-            COMPRESSED_TRANSFER_AMOUNT,
-            senderKp,            // token authority (sender)
-            recipientPubkey,     // recipient
-            tree,
-            {
-              skipPreflight: false,
-            }
-        );
-        console.log(
-            `Compressed SOL Transfer: Keypair[${i}] --> Keypair[${recipientIndex}] ` +
-            `Success. Tx: ${transferTxId}`
-        );
-      });
+            const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
+            const { tree } = pickRandomTreeAndQueue(activeStateTrees);
 
-      // Wait for all compress+transfer calls in this iteration to finish
-      await Promise.all(compressAndTransferPromises);
+            const compressAndTransferPromises = newKeypairs.map(
+                async (senderKp, i) => {
+                    const balance = await connection.getBalance(senderKp.publicKey);
+                    const thresholdLamports = MIN_SOL_PER_KEYPAIR * LAMPORTS_PER_SOL;
 
-      // Sleep 2 seconds before the next iteration
-      // await sleep(2000);
-      console.log("\n--- Iteration complete. Starting next iteration... ---\n");
+                    if (balance < thresholdLamports) {
+                        const topUpLamports = thresholdLamports - balance;
+                        const topUpTx = new Transaction().add(
+                            SystemProgram.transfer({
+                                fromPubkey: fromKeypair.publicKey,
+                                toPubkey: senderKp.publicKey,
+                                lamports: topUpLamports,
+                            }),
+                        );
+                        await sendAndConfirmTransaction(connection, topUpTx, [fromKeypair]);
+                    }
+
+                    const compressTxId = await compress(
+                        connection,
+                        senderKp,
+                        COMPRESS_LAMPORTS,
+                        senderKp.publicKey,
+                        tree,
+                    );
+                    console.log(`Compressed ${COMPRESS_LAMPORTS} lamports for ${senderKp.publicKey.toBase58()}. Tx: ${compressTxId}`);
+
+                    const recipientIndex = (i + 1) % batchSize;
+                    const recipientPubkey = newKeypairs[recipientIndex].publicKey;
+
+                    await transfer(
+                        connection,
+                        senderKp,
+                        COMPRESSED_TRANSFER_AMOUNT,
+                        senderKp,
+                        recipientPubkey,
+                        tree,
+                        { skipPreflight: false },
+                    );
+                    console.log(`Transferred ${COMPRESSED_TRANSFER_AMOUNT} SOL from ${senderKp.publicKey.toBase58()} to ${recipientPubkey.toBase58()}`);
+                },
+            );
+
+            await Promise.all(compressAndTransferPromises);
+        }
+
+        // 4. Return remaining funds to main wallet
+        console.log('\nReturning remaining funds to main wallet...');
+        for (const keypair of newKeypairs) {
+            await returnFundsToMain(keypair);
+        }
+
+    } catch (error) {
+        console.error("An error occurred:", error);
     }
-
-  } catch (error) {
-    console.error("An error occurred:", error);
-  }
 })();
