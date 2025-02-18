@@ -7,6 +7,7 @@ import {
   buildAndSignTx,
   createRpc,
   dedupeSigner,
+  pickRandomTreeAndQueue,
   Rpc,
 } from "@lightprotocol/stateless.js";
 import * as splToken from "@solana/spl-token";
@@ -16,6 +17,11 @@ import * as splToken from "@solana/spl-token";
     const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
     const mintAddress = MINT_ADDRESS;
     const payer = PAYER_KEYPAIR;
+
+    const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
+
+    const { tree } = pickRandomTreeAndQueue(activeStateTrees);
+    console.log("Picked output state tree:", tree.toBase58());
 
     // Get the source token account for the mint address
     const sourceTokenAccount = await splToken.getOrCreateAssociatedTokenAccount(
@@ -71,6 +77,7 @@ import * as splToken from "@solana/spl-token";
         toAddress: recipientBatch,
         amount: recipientBatch.map(() => amount),
         mint: mintAddress,
+        outputStateTree: tree,
       });
       instructions.push(compressIx);
       i += maxRecipientsPerInstruction;

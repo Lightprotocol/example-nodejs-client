@@ -7,6 +7,23 @@ export const RPC_ENDPOINT = process.env.RPC_ENDPOINT;
 export const PAYER_KEYPAIR = Keypair.fromSecretKey(
   bs58.decode(process.env.PAYER_KEYPAIR!)
 );
+
+export const AUTHORITY_KEYPAIR = process.env.LUT_AUTHORITY_KEYPAIR
+  ? Keypair.fromSecretKey(
+      Uint8Array.from(JSON.parse(process.env.LUT_AUTHORITY_KEYPAIR))
+    )
+  : undefined;
+
+export const LUT_MAINNET_AUTHORITY_KEYPAIR = process.env.LUT_AUTHORITY_KEYPAIR
+  ? Keypair.fromSecretKey(
+      Uint8Array.from(JSON.parse(process.env.LUT_AUTHORITY_KEYPAIR))
+    )
+  : undefined;
+
+export const LUT_DEVNET_AUTHORITY_KEYPAIR = process.env.LUT_DEVNET_AUTH_KEYPAIR
+  ? Keypair.fromSecretKey(bs58.decode(process.env.LUT_DEVNET_AUTH_KEYPAIR))
+  : undefined;
+
 export const MINT_ADDRESS = new PublicKey(process.env.MINT_ADDRESS!);
 if (!RPC_ENDPOINT) throw new Error("Please set RPC_ENDPOINT in .env");
 if (!PAYER_KEYPAIR)

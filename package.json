@@ -9,6 +9,7 @@
     "token": "ts-node src/scripts/token.ts",
     "connection": "ts-node src/scripts/connection.ts",
     "lookup-table": "ts-node src/scripts/lookup-table.ts",
+    "state-lut": "ts-node src/internal/state-lut.ts",
     "batch-compress": "ts-node src/scripts/batch-compress.ts",
     "compress-with-delegate": "ts-node src/scripts/compress-with-delegate.ts",
     "mint-spl": "ts-node src/scripts/mint-spl.ts",
@@ -17,6 +18,7 @@
     "pulse": "ts-node src/internal/transfer-pulse.ts",
     "create-account-pulse": "ts-node src/internal/create-account-pulse.ts",
     "create-account-with-lamports-pulse": "ts-node src/internal/create-account-with-lamports-pulse.ts",
+    "airdrop": "ts-node src/scripts/airdrop/airdrop.ts",
     "test": "npm run lamports && npm run token && npm run connection && npm run batch-compress && npm run mint-spl && npm run mint-spl-22 && npm run mint-spl-22-manual"
   },
   "repository": {
@@ -31,15 +33,19 @@
   },
   "homepage": "https://github.com/Lightprotocol/example-nodejs-client#readme",
   "dependencies": {
-    "@lightprotocol/compressed-token": "0.19.0",
-    "@lightprotocol/stateless.js": "0.19.0",
+    "@lightprotocol/compressed-token": "0.20.3",
+    "@lightprotocol/stateless.js": "0.20.3",
     "@solana/spl-token": "0.3.9",
     "@solana/spl-token-metadata": "^0.1.6",
     "@solana/web3.js": "^1.98.0",
     "@types/node": "^20.12.7",
+    "bn.js": "^5.2.1",
     "bs58": "^6.0.0",
     "dotenv": "^16.4.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.6"
   }
 }

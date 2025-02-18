@@ -11,7 +11,7 @@ import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
 import { randomBytes } from "crypto";
 
 const fromKeypair = PAYER_KEYPAIR;
-const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
+const connection: Rpc = createRpc(RPC_ENDPOINT);
 
 (async () => {
   try {

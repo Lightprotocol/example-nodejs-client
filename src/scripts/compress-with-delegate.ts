@@ -1,4 +1,9 @@
-import { Rpc, confirmTx, createRpc } from "@lightprotocol/stateless.js";
+import {
+  Rpc,
+  confirmTx,
+  createRpc,
+  pickRandomTreeAndQueue,
+} from "@lightprotocol/stateless.js";
 import { compress, createMint } from "@lightprotocol/compressed-token";
 import {
   getOrCreateAssociatedTokenAccount,
@@ -61,6 +66,9 @@ const connection: Rpc = createRpc();
   );
   console.log(`approve success! txId: ${approveTxId}`);
 
+  const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
+  const { tree } = pickRandomTreeAndQueue(activeStateTrees);
+
   const compressTxId = await compress(
     connection,
     payer,
@@ -68,7 +76,8 @@ const connection: Rpc = createRpc();
     1e5,
     delegate,
     ata.address,
-    recipient.publicKey
+    recipient.publicKey,
+    tree
   );
   console.log(`compress success! txId: ${compressTxId}`);
 })();

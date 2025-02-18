@@ -1,4 +1,9 @@
-import { Rpc, createRpc, sendAndConfirmTx } from "@lightprotocol/stateless.js";
+import {
+  Rpc,
+  createRpc,
+  pickRandomTreeAndQueue,
+  sendAndConfirmTx,
+} from "@lightprotocol/stateless.js";
 
 import {
   getOrCreateAssociatedTokenAccount,
@@ -46,6 +51,8 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
   const metadataLen = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
 
+  const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
+  const { tree } = pickRandomTreeAndQueue(activeStateTrees);
   // airdrop for gas
   // await confirmTx(
   //   connection,
@@ -136,7 +143,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
     payer,
     ata.address,
     payer.publicKey,
-    undefined,
+    tree,
     undefined,
     TOKEN_2022_PROGRAM_ID
   );
