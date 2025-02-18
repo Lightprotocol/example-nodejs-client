@@ -1,13 +1,13 @@
+import { Rpc } from "@lightprotocol/stateless.js";
 import { RPC_ENDPOINT } from "../constants";
 const stateless = require("@lightprotocol/stateless.js");
 
-const connection = stateless.createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
+const connection: Rpc = stateless.createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
 (async () => {
-  let slot = await connection.getSlot();
-  console.log(slot);
+  const slot = await connection.getSlot();
+  console.log("Slot:", slot);
 
-  let health = await connection.getIndexerHealth(slot);
-  console.log(health);
-  // "Ok"
+  const health = await connection.getIndexerHealth();
+  console.log("Indexer Health:", health);
 })();
