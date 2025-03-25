@@ -37,7 +37,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
   console.log(`ATA: ${ata.address}`);
 
-  await mintToSpl(
+  const mintTxId = await mintToSpl(
     connection,
     payer,
     mint,
@@ -45,4 +45,5 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
     payer.publicKey,
     BigInt("240000050")
   );
+  console.log(`mint-spl success! txId: ${mintTxId}`);
 })();
