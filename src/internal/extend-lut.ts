@@ -44,7 +44,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT, RPC_ENDPOINT);
 
   await extend(
     payer,
-    authority,
+    authority!,
     address,
     info.flatMap((i) => [i.tree])
   );
@@ -63,7 +63,7 @@ async function extend(
     addresses,
   });
   const bhash = await connection.getLatestBlockhash();
-  const tx = await buildAndSignTx(
+  const tx = buildAndSignTx(
     [extendInstruction],
     payer,
     bhash.blockhash,

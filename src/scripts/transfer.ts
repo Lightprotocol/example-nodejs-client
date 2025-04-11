@@ -18,8 +18,9 @@ import {
   BOB_KEYPAIR,
 } from "../constants";
 import { BN } from "bn.js";
-const payer = BOB_KEYPAIR!;
-const tokenRecipient = PAYER_KEYPAIR;
+
+const payer = PAYER_KEYPAIR;
+const tokenRecipient = BOB_KEYPAIR!;
 console.log(payer.publicKey.toBase58());
 console.log(tokenRecipient.publicKey.toBase58());
 /// Localnet, expects `light test-validator` to be running:
