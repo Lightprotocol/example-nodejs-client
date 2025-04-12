@@ -7,18 +7,13 @@ export const RPC_ENDPOINT = process.env.RPC_ENDPOINT;
 export const PAYER_KEYPAIR = Keypair.fromSecretKey(
   bs58.decode(process.env.PAYER_KEYPAIR!)
 );
-
 export const MINT_ADDRESS = new PublicKey(process.env.MINT_ADDRESS!);
-
-export const AUTHORITY_KEYPAIR = process.env.LUT_AUTHORITY_KEYPAIR
-  ? Keypair.fromSecretKey(
-      Uint8Array.from(JSON.parse(process.env.LUT_AUTHORITY_KEYPAIR))
-    )
-  : undefined;
-
-export const BOB_KEYPAIR = process.env.BOB_KEYPAIR
-  ? Keypair.fromSecretKey(Uint8Array.from(JSON.parse(process.env.BOB_KEYPAIR)))
-  : undefined;
+export const AUTHORITY_KEYPAIR = Keypair.fromSecretKey(
+  Uint8Array.from(JSON.parse(process.env.LUT_AUTHORITY_KEYPAIR!))
+);
+export const BOB_KEYPAIR = Keypair.fromSecretKey(
+  Uint8Array.from(JSON.parse(process.env.BOB_KEYPAIR!))
+);
 
 export const LUT_MAINNET_AUTHORITY_KEYPAIR = process.env.LUT_AUTHORITY_KEYPAIR
   ? Keypair.fromSecretKey(
@@ -34,5 +29,8 @@ if (!RPC_ENDPOINT) throw new Error("Please set RPC_ENDPOINT in .env");
 if (!PAYER_KEYPAIR)
   throw new Error("Please set PAYER_KEYPAIR as bs58 string in .env");
 if (!MINT_ADDRESS) throw new Error("Please set MINT_ADDRESS in .env");
+if (!AUTHORITY_KEYPAIR)
+  throw new Error("Please set LUT_AUTHORITY_KEYPAIR in .env");
+if (!BOB_KEYPAIR) throw new Error("Please set BOB_KEYPAIR in .env");
 
 console.log("PAYER PUBLIC KEY:", PAYER_KEYPAIR.publicKey.toString());

@@ -53,7 +53,7 @@ const cpis = [
   const data = await createStateTreeLookupTable({
     connection,
     payer,
-    authority: AUTHORITY_KEYPAIR,
+    authority: AUTHORITY_KEYPAIR!,
     recentSlot: await connection.getSlot(),
   });
 
@@ -67,7 +67,7 @@ const cpis = [
     newQueueAddresses: queueAddresses.slice(0, queueAddresses.length / 2),
     newCpiContextAddresses: cpis.slice(0, cpis.length / 2),
     payer,
-    authority: AUTHORITY_KEYPAIR,
+    authority: AUTHORITY_KEYPAIR!,
   });
 
   await extendStateTreeLookupTable({
@@ -79,6 +79,6 @@ const cpis = [
     newQueueAddresses: queueAddresses.slice(queueAddresses.length / 2),
     newCpiContextAddresses: cpis.slice(cpis.length / 2),
     payer,
-    authority: AUTHORITY_KEYPAIR,
+    authority: AUTHORITY_KEYPAIR!,
   });
 })();

@@ -2,6 +2,7 @@ import {
   Rpc,
   createRpc,
   pickRandomTreeAndQueue,
+  selectStateTreeInfo,
   sendAndConfirmTx,
 } from "@lightprotocol/stateless.js";
 
@@ -51,8 +52,9 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
   const metadataLen = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
 
-  const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
-  const { tree } = pickRandomTreeAndQueue(activeStateTrees);
+  const treeInfos = await connection.getCachedActiveStateTreeInfos();
+  const treeInfo = selectStateTreeInfo(treeInfos);
+
   // airdrop for gas
   // await confirmTx(
   //   connection,
@@ -143,9 +145,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
     payer,
     ata.address,
     payer.publicKey,
-    tree,
-    undefined,
-    TOKEN_2022_PROGRAM_ID
+    treeInfo
   );
   console.log(`compressed-token success! txId: ${compressedTokenTxId}`);
 

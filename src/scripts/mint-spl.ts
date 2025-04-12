@@ -16,8 +16,6 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
   //   await connection.requestAirdrop(payer.publicKey, 1e7)
   // );
 
-  const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
-
   const { mint, transactionSignature } = await createMint(
     connection,
     payer,

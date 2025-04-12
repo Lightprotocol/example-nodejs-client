@@ -3,10 +3,10 @@ import {
   createRpc,
   LightSystemProgram,
   Rpc,
+  selectStateTreeInfo,
 } from "@lightprotocol/stateless.js";
 import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
 import { randomBytes } from "crypto";
-import { PublicKey } from "@solana/web3.js";
 
 const fromKeypair = PAYER_KEYPAIR;
 
@@ -26,7 +26,9 @@ const trees = [
 (async () => {
   try {
     while (true) {
-      const pseudoRandomTree = trees[Math.floor(Math.random() * trees.length)];
+      const infos = await connection.getCachedActiveStateTreeInfos();
+      const info = selectStateTreeInfo(infos);
+
       // Create account with random address
       const randomSeed = new Uint8Array(randomBytes(32));
       const txId = await createAccount(
@@ -35,8 +37,7 @@ const trees = [
         [randomSeed],
         LightSystemProgram.programId,
         undefined,
-        undefined,
-        new PublicKey(pseudoRandomTree)
+        info
       );
       console.log(
         `Compressed Account Creation Success. Transaction Signature:`,

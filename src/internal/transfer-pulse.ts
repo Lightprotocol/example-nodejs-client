@@ -2,13 +2,12 @@ import {
   bn,
   compress,
   createRpc,
-  pickRandomTreeAndQueue,
   Rpc,
+  selectStateTreeInfo,
   sleep,
   transfer,
 } from "@lightprotocol/stateless.js";
 import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
-import { PublicKey } from "@solana/web3.js";
 
 const fromKeypair = PAYER_KEYPAIR;
 const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
@@ -16,17 +15,16 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 const batchSize = 10;
 (async () => {
   try {
-    const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
-
-    const { tree, queue } = pickRandomTreeAndQueue(activeStateTrees);
-    console.log("Picked output state tree:", tree.toBase58());
+    const infos = await connection.getCachedActiveStateTreeInfos();
+    const info = selectStateTreeInfo(infos);
+    console.log("Picked output state tree:", info.tree.toBase58());
 
     const compressedTxId = await compress(
       connection,
       fromKeypair,
       bn(1e5),
       fromKeypair.publicKey,
-      tree
+      info
     );
     while (true) {
       console.log("Compressed TxId", compressedTxId);
@@ -41,7 +39,7 @@ const batchSize = 10;
             1,
             fromKeypair,
             fromKeypair.publicKey,
-            tree,
+            info,
             {
               skipPreflight: false,
             }
