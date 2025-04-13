@@ -23,6 +23,7 @@ const trees = [
   "smt9ReAYRF5eFjTd5gBJMn5aKwNRcmp3ub2CQr2vW7j",
   "smtAvYA5UbTRyKAkAj5kHs1CmrA42t6WkVLi4c6mA1f",
 ];
+
 (async () => {
   try {
     while (true) {

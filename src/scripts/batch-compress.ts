@@ -94,9 +94,9 @@ import * as splToken from "@solana/spl-token";
 
     // Use zk-compression LUT for your network
     // https://www.zkcompression.com/developers/protocol-addresses-and-urls#lookup-tables
-    // Default: DA35UyyzGTonmEjsbw1VGRACpKxbKUPS2DvrG193QYHC
     const lookupTableAddress = new web3.PublicKey(
-      "qAJZMgnQJ8G6vA3WRcjD9Jan1wtKkaCFWLWskxJrR5V" // devnet
+      // "qAJZMgnQJ8G6vA3WRcjD9Jan1wtKkaCFWLWskxJrR5V" // devnet
+      "9NYFyEqPkyXUhkerbGHXUXkvb4qpzeEdHuGpgbgpH1NJ" // devnet
     );
 
     // Get the lookup table account
