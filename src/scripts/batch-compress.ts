@@ -21,7 +21,7 @@ import * as splToken from "@solana/spl-token";
     const mintAddress = MINT_ADDRESS;
     const payer = PAYER_KEYPAIR;
 
-    const treeInfos = await connection.getCachedActiveStateTreeInfos();
+    const treeInfos = await connection.getStateTreeInfos();
     const treeInfo = selectStateTreeInfo(treeInfos);
 
     // Get a token pool

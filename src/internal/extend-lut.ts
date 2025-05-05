@@ -3,7 +3,7 @@ import {
   buildAndSignTx,
   createRpc,
   dedupeSigner,
-  getActiveStateTreeInfos,
+  getAllStateTreeInfos,
   sendAndConfirmTx,
 } from "@lightprotocol/stateless.js";
 import {
@@ -22,13 +22,6 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT, RPC_ENDPOINT);
   // const address = new PublicKey("9NYFyEqPkyXUhkerbGHXUXkvb4qpzeEdHuGpgbgpH1NJ");
   const address = new PublicKey("qAJZMgnQJ8G6vA3WRcjD9Jan1wtKkaCFWLWskxJrR5V");
 
-  // const stateTreeLookupTableMainnet = new PublicKey(
-  //   "7i86eQs3GSqHjN47WdWLTCGMW6gde1q96G2EVnUyK2st"
-  // );
-  // const nullifiedStateTreeLookupTableMainnet = new PublicKey(
-  //   "H9QD4u1fG7KmkAzn2tDXhheushxFe1EcrjGGyEFXeMqT"
-  // );
-
   const stateTreeLookupTableDevnet = new PublicKey(
     "8n8rH2bFRVA6cSGNDpgqcKHCndbFCT1bXxAQG89ejVsh"
   );
@@ -36,7 +29,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT, RPC_ENDPOINT);
     "5dhaJLBjnVBQFErr8oiCJmcVsx3Zj6xDekGB2zULPsnP"
   );
 
-  const info = await getActiveStateTreeInfos({
+  const info = await getAllStateTreeInfos({
     connection,
     stateTreeLUTPairs: [
       {

@@ -76,7 +76,7 @@ const recipients = [
   );
   console.log(`mint-to success! txId: ${mintToTxId}`);
 
-  const treeInfos = await connection.getCachedActiveStateTreeInfos();
+  const treeInfos = await connection.getStateTreeInfos();
   const tokenPoolInfos = await getTokenPoolInfos(connection, mint);
   const instructionBatches = await createAirdropInstructions({
     amount: 1e6,

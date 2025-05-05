@@ -9,7 +9,7 @@ export const PAYER_KEYPAIR = Keypair.fromSecretKey(
 );
 export const MINT_ADDRESS = new PublicKey(process.env.MINT_ADDRESS!);
 export const AUTHORITY_KEYPAIR = Keypair.fromSecretKey(
-  Uint8Array.from(JSON.parse(process.env.LUT_AUTHORITY_KEYPAIR!))
+  Uint8Array.from(JSON.parse(process.env.AUTHORITY_KEYPAIR!))
 );
 export const BOB_KEYPAIR = Keypair.fromSecretKey(
   Uint8Array.from(JSON.parse(process.env.BOB_KEYPAIR!))

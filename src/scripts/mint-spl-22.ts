@@ -52,7 +52,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
   const metadataLen = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
 
-  const treeInfos = await connection.getCachedActiveStateTreeInfos();
+  const treeInfos = await connection.getStateTreeInfos();
   const treeInfo = selectStateTreeInfo(treeInfos);
 
   // airdrop for gas

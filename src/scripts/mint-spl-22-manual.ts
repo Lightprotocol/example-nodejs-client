@@ -38,7 +38,7 @@ const payer = PAYER_KEYPAIR;
 const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
 (async () => {
-  const treeInfos = await connection.getCachedActiveStateTreeInfos();
+  const treeInfos = await connection.getStateTreeInfos();
   const treeInfo = selectStateTreeInfo(treeInfos);
 
   const mint = Keypair.generate();
@@ -162,8 +162,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
     mint.publicKey,
     1e5,
     payer,
-    payer.publicKey, // self-transfer
-    treeInfo
+    payer.publicKey // self-transfer
   );
   console.log(`transfer-compressed success! txId: ${transferCompressedTxId}`);
 })();

@@ -16,7 +16,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT);
 (async () => {
   try {
     while (true) {
-      const infos = await connection.getCachedActiveStateTreeInfos();
+      const infos = await connection.getStateTreeInfos();
       const info = selectStateTreeInfo(infos);
       console.log("Picked output state tree:", info.tree.toBase58());
       const compressedTxId = await compress(

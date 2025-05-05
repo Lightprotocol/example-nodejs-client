@@ -15,7 +15,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 const batchSize = 10;
 (async () => {
   try {
-    const infos = await connection.getCachedActiveStateTreeInfos();
+    const infos = await connection.getStateTreeInfos();
     const info = selectStateTreeInfo(infos);
     console.log("Picked output state tree:", info.tree.toBase58());
 

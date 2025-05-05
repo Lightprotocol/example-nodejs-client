@@ -5,7 +5,6 @@ import {
   dedupeSigner,
   sendAndConfirmTx,
   createRpc,
-  selectStateTreeInfo,
 } from "@lightprotocol/stateless.js";
 import {
   CompressedTokenProgram,
@@ -38,17 +37,12 @@ const amount = bn(100);
     amount
   );
 
-  // 3. Select state tree
-  const info = selectStateTreeInfo(
-    await connection.getCachedActiveStateTreeInfos()
-  );
-
-  // 4. Fetch validity proof
+  // 3. Fetch validity proof
   const proof = await connection.getValidityProof(
     inputAccounts.map((account) => bn(account.compressedAccount.hash))
   );
 
-  // 5. Build instruction
+  // 4. Build instruction
   const ix = await CompressedTokenProgram.transfer({
     payer: payer.publicKey,
     inputCompressedTokenAccounts: inputAccounts,
@@ -56,7 +50,6 @@ const amount = bn(100);
     amount,
     recentInputStateRootIndices: proof.rootIndices,
     recentValidityProof: proof.compressedProof,
-    outputStateTreeInfo: info,
   });
 
   const { blockhash } = await connection.getLatestBlockhash();

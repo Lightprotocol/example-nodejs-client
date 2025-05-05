@@ -42,7 +42,7 @@ const PAYER_KEYPAIR = Keypair.fromSecretKey(
     );
 
     // Get a state tree
-    const treeInfos = await connection.getCachedActiveStateTreeInfos();
+    const treeInfos = await connection.getStateTreeInfos();
     const treeInfo = selectStateTreeInfo(treeInfos);
 
     // Get a token pool
@@ -61,9 +61,7 @@ const PAYER_KEYPAIR = Keypair.fromSecretKey(
     // Airdrop to example recipients addresses
     // 1 recipient = 120_000 CU
     // 5 recipients = 170_000 CU
-
     const instructions: TransactionInstruction[] = [];
-
     instructions.push(
       ComputeBudgetProgram.setComputeUnitLimit({ units: 120_000 }),
       ComputeBudgetProgram.setComputeUnitPrice({
@@ -88,7 +86,6 @@ const PAYER_KEYPAIR = Keypair.fromSecretKey(
     // https://www.zkcompression.com/developers/protocol-addresses-and-urls#lookup-tables
     const lookupTableAddress = new PublicKey(
       "9NYFyEqPkyXUhkerbGHXUXkvb4qpzeEdHuGpgbgpH1NJ" // mainnet
-      // "qAJZMgnQJ8G6vA3WRcjD9Jan1wtKkaCFWLWskxJrR5V" // devnet
     );
 
     // Get the lookup table account state
