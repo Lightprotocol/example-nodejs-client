@@ -13,7 +13,7 @@ import {
   selectMinCompressedTokenAccountsForTransfer,
   selectTokenPoolInfosForDecompression,
 } from "@lightprotocol/compressed-token";
-import { MINT_ADDRESS, PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
+import { MINT_ADDRESS, PAYER_KEYPAIR, RPC_ENDPOINT } from "../shared/constants";
 
 const connection: Rpc = createRpc(RPC_ENDPOINT);
 

@@ -9,6 +9,6 @@
     "strict": true,
     "skipLibCheck": false
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "shared/constants.ts"],
   "exclude": ["node_modules", "dist"]
 }

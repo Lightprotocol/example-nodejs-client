@@ -16,7 +16,7 @@ import {
   RPC_ENDPOINT,
   MINT_ADDRESS,
   BOB_KEYPAIR,
-} from "../constants";
+} from "../shared/constants";
 const payer = PAYER_KEYPAIR;
 const tokenRecipient = BOB_KEYPAIR;
 

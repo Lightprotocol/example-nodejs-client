@@ -5,7 +5,7 @@ import {
   mintTo as mintToSpl,
   approve,
 } from "@solana/spl-token";
-import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
+import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../../shared/constants";
 import { Keypair } from "@solana/web3.js";
 
 const payer = PAYER_KEYPAIR;

@@ -21,7 +21,7 @@ import {
   LENGTH_SIZE,
   TYPE_SIZE,
 } from "@solana/spl-token";
-import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
+import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../../shared/constants";
 import {
   Keypair,
   SystemProgram,
