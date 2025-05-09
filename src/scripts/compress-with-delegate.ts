@@ -1,9 +1,4 @@
-import {
-  Rpc,
-  confirmTx,
-  createRpc,
-  pickRandomTreeAndQueue,
-} from "@lightprotocol/stateless.js";
+import { Rpc, confirmTx, createRpc } from "@lightprotocol/stateless.js";
 import { compress, createMint } from "@lightprotocol/compressed-token";
 import {
   getOrCreateAssociatedTokenAccount,
@@ -16,11 +11,9 @@ import { Keypair } from "@solana/web3.js";
 const payer = PAYER_KEYPAIR;
 const delegate = Keypair.generate();
 const recipient = Keypair.generate();
-console.log(`delegate: ${delegate.publicKey.toBase58()}`);
-console.log(`recipient: ${recipient.publicKey.toBase58()}`);
 
 // Ensure you have light test-validator running
-const connection: Rpc = createRpc();
+const connection: Rpc = createRpc(RPC_ENDPOINT);
 
 (async () => {
   /// airdrop lamports to pay fees
@@ -66,9 +59,6 @@ const connection: Rpc = createRpc();
   );
   console.log(`approve success! txId: ${approveTxId}`);
 
-  const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
-  const { tree } = pickRandomTreeAndQueue(activeStateTrees);
-
   const compressTxId = await compress(
     connection,
     payer,
@@ -76,8 +66,7 @@ const connection: Rpc = createRpc();
     1e5,
     delegate,
     ata.address,
-    recipient.publicKey,
-    tree
+    recipient.publicKey
   );
   console.log(`compress success! txId: ${compressTxId}`);
 })();

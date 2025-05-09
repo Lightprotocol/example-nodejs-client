@@ -1,14 +1,22 @@
-import * as web3 from "@solana/web3.js";
-import { Keypair, PublicKey } from "@solana/web3.js";
-import { CompressedTokenProgram } from "@lightprotocol/compressed-token";
+import {
+  ComputeBudgetProgram,
+  Keypair,
+  PublicKey,
+  TransactionInstruction,
+} from "@solana/web3.js";
+import {
+  CompressedTokenProgram,
+  getTokenPoolInfos,
+  selectTokenPoolInfo,
+} from "@lightprotocol/compressed-token";
 import {
   bn,
   buildAndSignTx,
   calculateComputeUnitPrice,
   createRpc,
   dedupeSigner,
-  pickRandomTreeAndQueue,
   Rpc,
+  selectStateTreeInfo,
   sendAndConfirmTx,
 } from "@lightprotocol/stateless.js";
 import * as splToken from "@solana/spl-token";
@@ -32,10 +40,14 @@ const PAYER_KEYPAIR = Keypair.fromSecretKey(
     const recipients = ["GMPWaPPrCeZPse5kwSR3WUrqYAPrVZBSVwymqh7auNW7"].map(
       (address) => new PublicKey(address)
     );
-    const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
 
-    /// Pick a new tree for each transaction!
-    const { tree } = pickRandomTreeAndQueue(activeStateTrees);
+    // Get a state tree
+    const treeInfos = await connection.getCachedActiveStateTreeInfos();
+    const treeInfo = selectStateTreeInfo(treeInfos);
+
+    // Get a token pool
+    const tokenPool = await getTokenPoolInfos(connection, mintAddress);
+    const tokenPoolInfo = selectTokenPoolInfo(tokenPool);
 
     // Create an SPL token account for the sender.
     // The sender will send tokens from this account to the recipients as compressed tokens.
@@ -50,11 +62,11 @@ const PAYER_KEYPAIR = Keypair.fromSecretKey(
     // 1 recipient = 120_000 CU
     // 5 recipients = 170_000 CU
 
-    const instructions: web3.TransactionInstruction[] = [];
+    const instructions: TransactionInstruction[] = [];
 
     instructions.push(
-      web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 120_000 }),
-      web3.ComputeBudgetProgram.setComputeUnitPrice({
+      ComputeBudgetProgram.setComputeUnitLimit({ units: 120_000 }),
+      ComputeBudgetProgram.setComputeUnitPrice({
         // ideally replace this with a dynamic priority_fee based on network conditions.
         microLamports: calculateComputeUnitPrice(20_000, 120_000),
       })
@@ -63,17 +75,18 @@ const PAYER_KEYPAIR = Keypair.fromSecretKey(
     const compressInstruction = await CompressedTokenProgram.compress({
       payer: payer.publicKey,
       owner: payer.publicKey,
-      source: sourceTokenAccount.address, // here, the owner of this account is also the payer.
+      source: sourceTokenAccount.address,
       toAddress: recipients,
       amount: recipients.map(() => amount),
       mint: mintAddress,
-      outputStateTree: tree,
+      outputStateTreeInfo: treeInfo,
+      tokenPoolInfo,
     });
     instructions.push(compressInstruction);
 
     // Use zk-compression LUT for your network
     // https://www.zkcompression.com/developers/protocol-addresses-and-urls#lookup-tables
-    const lookupTableAddress = new web3.PublicKey(
+    const lookupTableAddress = new PublicKey(
       "9NYFyEqPkyXUhkerbGHXUXkvb4qpzeEdHuGpgbgpH1NJ" // mainnet
       // "qAJZMgnQJ8G6vA3WRcjD9Jan1wtKkaCFWLWskxJrR5V" // devnet
     );

@@ -1,8 +1,9 @@
-import { CompressedTokenProgram } from "@lightprotocol/compressed-token";
+import { CompressedTokenProgram, selectTokenPoolInfo, TokenPoolInfo } from "@lightprotocol/compressed-token";
 import {
   bn,
-  ActiveTreeBundle,
   pickRandomTreeAndQueue,
+  selectStateTreeInfo,
+  StateTreeInfo,
 } from "@lightprotocol/stateless.js";
 import {
   ComputeBudgetProgram,
@@ -16,7 +17,8 @@ interface CreateAirdropInstructionsParams {
   payer: PublicKey;
   sourceTokenAccount: PublicKey;
   mint: PublicKey;
-  stateTrees: ActiveTreeBundle[];
+  tokenPoolInfos: TokenPoolInfo[];
+  outputStateTreeInfos: StateTreeInfo[];
   maxRecipientsPerInstruction?: number;
   maxInstructionsPerTransaction?: number;
   computeUnitLimit?: number;
@@ -31,7 +33,8 @@ export async function createAirdropInstructions({
   payer,
   sourceTokenAccount,
   mint,
-  stateTrees,
+  tokenPoolInfos,
+  outputStateTreeInfos,
   maxRecipientsPerInstruction = 5,
   maxInstructionsPerTransaction = 3,
   computeUnitLimit = 500_000,
@@ -59,8 +62,9 @@ export async function createAirdropInstructions({
       );
     }
 
-    const { tree } = pickRandomTreeAndQueue(stateTrees);
+    const tree = selectStateTreeInfo(outputStateTreeInfos);
 
+    const tokenPoolInfo = selectTokenPoolInfo(tokenPoolInfos);
     for (let j = 0; j < maxInstructionsPerTransaction; j++) {
       const startIdx = i + j * maxRecipientsPerInstruction;
       const recipientBatch = recipients.slice(
@@ -77,7 +81,8 @@ export async function createAirdropInstructions({
         toAddress: recipientBatch,
         amount: recipientBatch.map(() => amountBn),
         mint,
-        outputStateTree: tree,
+        outputStateTreeInfo: tree,
+        tokenPoolInfo,
       });
 
       instructions.push(compressIx);
