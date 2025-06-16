@@ -1,6 +1,10 @@
 import * as web3 from "@solana/web3.js";
 import { RPC_ENDPOINT, PAYER_KEYPAIR, MINT_ADDRESS } from "../constants";
-import { CompressedTokenProgram } from "@lightprotocol/compressed-token";
+import {
+  CompressedTokenProgram,
+  getTokenPoolInfos,
+  selectTokenPoolInfo,
+} from "@lightprotocol/compressed-token";
 
 import {
   bn,
@@ -9,6 +13,7 @@ import {
   dedupeSigner,
   pickRandomTreeAndQueue,
   Rpc,
+  selectStateTreeInfo,
   sendAndConfirmTx,
 } from "@lightprotocol/stateless.js";
 import * as splToken from "@solana/spl-token";
@@ -19,10 +24,13 @@ import * as splToken from "@solana/spl-token";
     const mintAddress = MINT_ADDRESS;
     const payer = PAYER_KEYPAIR;
 
-    const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
+    const activeStateTrees = await connection.getStateTreeInfos();
+    const treeInfo = selectStateTreeInfo(activeStateTrees);
+    console.log("Picked output state tree:", treeInfo.tree.toBase58());
 
-    const { tree } = pickRandomTreeAndQueue(activeStateTrees);
-    console.log("Picked output state tree:", tree.toBase58());
+    const tokenPoolInfo = selectTokenPoolInfo(
+      await getTokenPoolInfos(connection, mintAddress)
+    );
 
     // Get the source token account for the mint address
     const sourceTokenAccount = await splToken.getOrCreateAssociatedTokenAccount(
@@ -78,7 +86,8 @@ import * as splToken from "@solana/spl-token";
         toAddress: recipientBatch,
         amount: recipientBatch.map(() => amount),
         mint: mintAddress,
-        outputStateTree: tree,
+        outputStateTreeInfo: treeInfo,
+        tokenPoolInfo,
       });
       instructions.push(compressIx);
       i += maxRecipientsPerInstruction;

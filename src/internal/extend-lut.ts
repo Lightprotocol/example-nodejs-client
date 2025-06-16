@@ -3,7 +3,7 @@ import {
   buildAndSignTx,
   createRpc,
   dedupeSigner,
-  getLightStateTreeInfo,
+  getAllStateTreeInfos,
   sendAndConfirmTx,
 } from "@lightprotocol/stateless.js";
 import {
@@ -16,7 +16,7 @@ import { AddressLookupTableProgram, Keypair, PublicKey } from "@solana/web3.js";
 
 const payer = PAYER_KEYPAIR;
 const authority = LUT_DEVNET_AUTHORITY_KEYPAIR;
-const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT, RPC_ENDPOINT);
+const connection: Rpc = createRpc(RPC_ENDPOINT);
 
 (async () => {
   // const address = new PublicKey("9NYFyEqPkyXUhkerbGHXUXkvb4qpzeEdHuGpgbgpH1NJ");
@@ -36,10 +36,14 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT, RPC_ENDPOINT);
     "5dhaJLBjnVBQFErr8oiCJmcVsx3Zj6xDekGB2zULPsnP"
   );
 
-  const info = await getLightStateTreeInfo({
+  const info = await getAllStateTreeInfos({
     connection,
-    stateTreeLookupTableAddress: stateTreeLookupTableDevnet,
-    nullifyTableAddress: nullifiedStateTreeLookupTableDevnet,
+    stateTreeLUTPairs: [
+      {
+        stateTreeLookupTable: stateTreeLookupTableDevnet,
+        nullifyLookupTable: nullifiedStateTreeLookupTableDevnet,
+      },
+    ],
   });
 
   await extend(

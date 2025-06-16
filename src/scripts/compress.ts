@@ -1,6 +1,10 @@
 import * as web3 from "@solana/web3.js";
 import { Keypair, PublicKey } from "@solana/web3.js";
-import { CompressedTokenProgram } from "@lightprotocol/compressed-token";
+import {
+  CompressedTokenProgram,
+  getTokenPoolInfos,
+  selectTokenPoolInfo,
+} from "@lightprotocol/compressed-token";
 import {
   bn,
   buildAndSignTx,
@@ -9,6 +13,7 @@ import {
   dedupeSigner,
   pickRandomTreeAndQueue,
   Rpc,
+  selectStateTreeInfo,
   sendAndConfirmTx,
 } from "@lightprotocol/stateless.js";
 import * as splToken from "@solana/spl-token";
@@ -32,10 +37,10 @@ const PAYER_KEYPAIR = Keypair.fromSecretKey(
     const recipients = ["GMPWaPPrCeZPse5kwSR3WUrqYAPrVZBSVwymqh7auNW7"].map(
       (address) => new PublicKey(address)
     );
-    const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
+    const activeStateTrees = await connection.getStateTreeInfos();
 
     /// Pick a new tree for each transaction!
-    const { tree } = pickRandomTreeAndQueue(activeStateTrees);
+    const treeInfo = selectStateTreeInfo(activeStateTrees);
 
     // Create an SPL token account for the sender.
     // The sender will send tokens from this account to the recipients as compressed tokens.
@@ -67,7 +72,10 @@ const PAYER_KEYPAIR = Keypair.fromSecretKey(
       toAddress: recipients,
       amount: recipients.map(() => amount),
       mint: mintAddress,
-      outputStateTree: tree,
+      outputStateTreeInfo: treeInfo,
+      tokenPoolInfo: selectTokenPoolInfo(
+        await getTokenPoolInfos(connection, mintAddress)
+      ),
     });
     instructions.push(compressInstruction);
 

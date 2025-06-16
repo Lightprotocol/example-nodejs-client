@@ -2,6 +2,7 @@ import {
   Rpc,
   createRpc,
   pickRandomTreeAndQueue,
+  selectStateTreeInfo,
   sendAndConfirmTx,
 } from "@lightprotocol/stateless.js";
 
@@ -29,6 +30,8 @@ import {
 import {
   compress,
   CompressedTokenProgram,
+  getTokenPoolInfos,
+  selectTokenPoolInfo,
   transfer,
 } from "@lightprotocol/compressed-token";
 
@@ -51,8 +54,8 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
 
   const metadataLen = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
 
-  const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
-  const { tree } = pickRandomTreeAndQueue(activeStateTrees);
+  const activeStateTrees = await connection.getStateTreeInfos();
+  const treeInfo = selectStateTreeInfo(activeStateTrees);
   // airdrop for gas
   // await confirmTx(
   //   connection,
@@ -143,9 +146,8 @@ const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
     payer,
     ata.address,
     payer.publicKey,
-    tree,
-    undefined,
-    TOKEN_2022_PROGRAM_ID
+    treeInfo,
+    selectTokenPoolInfo(await getTokenPoolInfos(connection, mint.publicKey))
   );
   console.log(`compressed-token success! txId: ${compressedTokenTxId}`);
 
