@@ -16,7 +16,7 @@ import {
 } from "@lightprotocol/compressed-token";
 
 const fromKeypair = PAYER_KEYPAIR;
-const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
+const connection: Rpc = createRpc(RPC_ENDPOINT);
 
 const batchSize = 10;
 (async () => {
@@ -44,11 +44,7 @@ const batchSize = 10;
             fromKeypair,
             1,
             fromKeypair,
-            fromKeypair.publicKey,
-            treeInfo,
-            {
-              skipPreflight: false,
-            }
+            fromKeypair.publicKey
           )
         );
       }
