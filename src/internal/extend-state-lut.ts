@@ -8,7 +8,7 @@ import { PAYER_KEYPAIR, RPC_ENDPOINT, AUTHORITY_KEYPAIR } from "../constants";
 import { PublicKey } from "@solana/web3.js";
 
 const payer = PAYER_KEYPAIR;
-const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT, RPC_ENDPOINT);
+const connection: Rpc = createRpc(RPC_ENDPOINT);
 
 const stateTreeAddresses = [
   "smt1NamzXdq4AMqS2fS2F1i5KTYPZRhoHgWx38d8WsT",

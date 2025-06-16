@@ -27,7 +27,7 @@ console.log(tokenRecipient.publicKey.toBase58());
 // const connection: Rpc = createRpc();
 
 /// Uncomment to use env:
-const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT, RPC_ENDPOINT);
+const connection: Rpc = createRpc(RPC_ENDPOINT);
 const amount = new BN(100);
 
 (async () => {
@@ -58,7 +58,6 @@ const amount = new BN(100);
     amount,
     recentInputStateRootIndices: proof.rootIndices,
     recentValidityProof: proof.compressedProof,
-    outputStateTrees: undefined,
   });
 
   const { blockhash } = await connection.getLatestBlockhash();

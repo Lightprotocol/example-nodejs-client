@@ -9,7 +9,7 @@ const tokenRecipient = Keypair.generate();
 // const connection: Rpc = createRpc();
 
 /// Uncomment to use env:
-const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT, RPC_ENDPOINT);
+const connection: Rpc = createRpc(RPC_ENDPOINT);
 
 (async () => {
   /// airdrop lamports to pay fees

@@ -6,6 +6,7 @@ import {
   LightSystemProgram,
   pickRandomTreeAndQueue,
   Rpc,
+  selectStateTreeInfo,
 } from "@lightprotocol/stateless.js";
 import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
 import { randomBytes } from "crypto";
@@ -16,16 +17,16 @@ const connection: Rpc = createRpc(RPC_ENDPOINT);
 (async () => {
   try {
     while (true) {
-      const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
+      const stateTreeInfos = await connection.getStateTreeInfos();
+      const treeInfo = selectStateTreeInfo(stateTreeInfos);
 
-      const { tree, queue } = pickRandomTreeAndQueue(activeStateTrees);
-      console.log("Picked output state tree:", tree.toBase58());
+      console.log("Picked output state tree:", treeInfo.tree.toBase58());
       const compressedTxId = await compress(
         connection,
         fromKeypair,
         bn(10),
         fromKeypair.publicKey,
-        tree
+        treeInfo
       );
       console.log("Compressed TxId", compressedTxId);
       // Creat account with random address
@@ -36,8 +37,7 @@ const connection: Rpc = createRpc(RPC_ENDPOINT);
         10,
         LightSystemProgram.programId,
         undefined,
-        undefined,
-        tree
+        treeInfo
       );
       console.log(
         `Compressed Account Creation Success. Transaction Signature:`,

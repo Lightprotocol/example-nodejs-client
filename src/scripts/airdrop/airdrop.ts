@@ -3,8 +3,9 @@ import {
   calculateComputeUnitPrice,
   createRpc,
   Rpc,
+  selectStateTreeInfo,
 } from "@lightprotocol/stateless.js";
-import { createMint } from "@lightprotocol/compressed-token";
+import { createMint, getTokenPoolInfos } from "@lightprotocol/compressed-token";
 import { getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
 import { createAirdropInstructions } from "./create-instructions";
 import { BatchResultType, signAndSendAirdropBatches } from "./sign-and-send";
@@ -75,15 +76,16 @@ const recipients = [
   );
   console.log(`mint-to success! txId: ${mintToTxId}`);
 
-  const activeStateTrees = await connection.getCachedActiveStateTreeInfo();
-
+  const stateTreeInfos = await connection.getStateTreeInfos();
+  const tokenPoolInfos = await getTokenPoolInfos(connection, mint);
   const instructionBatches = await createAirdropInstructions({
     amount: 1e6,
     recipients,
     payer: PAYER.publicKey,
     sourceTokenAccount: ata.address,
     mint,
-    stateTrees: activeStateTrees,
+    stateTreeInfos,
+    tokenPoolInfos,
     computeUnitPrice: calculateComputeUnitPrice(10_000, 500_000),
   });
 
