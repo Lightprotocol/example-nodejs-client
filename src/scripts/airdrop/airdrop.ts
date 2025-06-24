@@ -65,7 +65,7 @@ const recipients = [
   );
   console.log(`ATA: ${ata.address.toBase58()}`);
 
-  //   /// Mint SPL tokens to the sender
+  /// Mint SPL tokens to the sender
   const mintToTxId = await mintTo(
     connection,
     PAYER,
