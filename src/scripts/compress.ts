@@ -81,20 +81,21 @@ const PAYER_KEYPAIR = Keypair.fromSecretKey(
 
     // Creates a cPDA for a given set of recipients. This lets you retry txns without handling spends client-side.
     // The whole txn will fail if the same set of seeds (with the same order) is used a second time.
-    instructions.push(
-      await createIdempotentAirdropInstruction(
-        connection,
-        payer.publicKey,
-        mintAddress,
-        recipients,
-        treeInfo
-      )
-    );
+    // instructions.push(
+    //   await createIdempotentAirdropInstruction(
+    //     connection,
+    //     payer.publicKey,
+    //     mintAddress,
+    //     recipients,
+    //     treeInfo
+    //   )
+    // );
 
     // Use zk-compression LUT for your network
     // https://www.zkcompression.com/developers/protocol-addresses-and-urls#lookup-tables
     const lookupTableAddress = new web3.PublicKey(
-      "9NYFyEqPkyXUhkerbGHXUXkvb4qpzeEdHuGpgbgpH1NJ" // mainnet
+      // "9NYFyEqPkyXUhkerbGHXUXkvb4qpzeEdHuGpgbgpH1NJ" // mainnet
+      "qAJZMgnQJ8G6vA3WRcjD9Jan1wtKkaCFWLWskxJrR5V" // devnet
     );
     // Get the lookup table account state
     const lookupTableAccount = (
