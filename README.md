@@ -21,18 +21,16 @@ To run the `token.ts` example:
 2. Create a `.env` file in the root directory using `.env.example` as a template.
 3. Set your `RPC_ENDPOINT`, `PAYER_KEYPAIR`, `MINT_ADDRESS` in the `.env` file.
 
-### Running the full example
+### Running examples
 
 ```bash
 npm install
 ```
 
 ```bash
-# npm run connection
-# npm run token
-# npm run lamports
-# npm run extended
-# npm run lookup-table
-npm run example
-npm run debug-ix-too-large
+npm run mint-spl
+```
+
+```bash
+npm run compress
 ```
