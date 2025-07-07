@@ -18,6 +18,7 @@ import {
 import * as splToken from "@solana/spl-token";
 import dotenv from "dotenv";
 import bs58 from "bs58";
+import { createIdempotentAirdropInstruction } from "./idempotent";
 dotenv.config();
 
 const RPC_ENDPOINT = process.env.RPC_ENDPOINT;
@@ -76,6 +77,18 @@ const PAYER_KEYPAIR = Keypair.fromSecretKey(
       ),
     });
     instructions.push(compressInstruction);
+
+    // Creates a cPDA for a given set of recipients. This lets you retry txns without handling spends client-side.
+    // The whole txn will fail if the same set of seeds (with the same order) is used a second time.
+    instructions.push(
+      await createIdempotentAirdropInstruction(
+        connection,
+        payer.publicKey,
+        mintAddress,
+        recipients,
+        treeInfo
+      )
+    );
 
     // Sign the transaction with the payer and owner keypair
     const owner = payer;
