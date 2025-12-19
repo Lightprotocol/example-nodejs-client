@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-name: "@lightprotocol/*"
+    commit-message:
+      prefix: "deps"
+    open-pull-requests-limit: 5
