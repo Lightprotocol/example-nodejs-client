@@ -13,7 +13,6 @@ import {
 import { ComputeBudgetProgram } from "@solana/web3.js";
 import {
   PAYER_KEYPAIR,
-  RPC_ENDPOINT,
   MINT_ADDRESS,
   BOB_KEYPAIR,
 } from "../constants";
@@ -24,10 +23,7 @@ const tokenRecipient = BOB_KEYPAIR!;
 console.log(payer.publicKey.toBase58());
 console.log(tokenRecipient.publicKey.toBase58());
 /// Localnet, expects `light test-validator` to be running:
-// const connection: Rpc = createRpc();
-
-/// Uncomment to use env:
-const connection: Rpc = createRpc(RPC_ENDPOINT);
+const connection: Rpc = createRpc();
 const amount = new BN(100);
 
 (async () => {

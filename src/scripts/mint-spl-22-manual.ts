@@ -23,7 +23,7 @@ import {
   LENGTH_SIZE,
   TYPE_SIZE,
 } from "@solana/spl-token";
-import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
+import { PAYER_KEYPAIR } from "../constants";
 import {
   Keypair,
   SystemProgram,
@@ -37,7 +37,8 @@ import {
 } from "@solana/spl-token-metadata";
 
 const payer = PAYER_KEYPAIR;
-const connection: Rpc = createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
+/// Localnet, expects `light test-validator` to be running:
+const connection: Rpc = createRpc();
 
 (async () => {
   const activeStateTrees = await connection.getStateTreeInfos();

@@ -4,10 +4,11 @@ import {
   getOrCreateAssociatedTokenAccount,
   mintTo as mintToSpl,
 } from "@solana/spl-token";
-import { PAYER_KEYPAIR, RPC_ENDPOINT } from "../constants";
+import { PAYER_KEYPAIR } from "../constants";
 
 const payer = PAYER_KEYPAIR;
-const connection: Rpc = createRpc(RPC_ENDPOINT);
+/// Localnet, expects `light test-validator` to be running:
+const connection: Rpc = createRpc();
 
 (async () => {
   /// airdrop lamports to pay fees

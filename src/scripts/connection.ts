@@ -1,9 +1,8 @@
-import { Rpc } from "@lightprotocol/stateless.js";
-import { RPC_ENDPOINT, PAYER_KEYPAIR } from "../constants";
+import { Rpc, createRpc } from "@lightprotocol/stateless.js";
+import { PAYER_KEYPAIR } from "../constants";
 
-const stateless = require("@lightprotocol/stateless.js");
-
-const connection: Rpc = stateless.createRpc(RPC_ENDPOINT, RPC_ENDPOINT);
+/// Localnet, expects `light test-validator` to be running:
+const connection: Rpc = createRpc();
 
 (async () => {
   const slot = await connection.getSlot();

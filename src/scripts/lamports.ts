@@ -1,4 +1,4 @@
-import { confirmTx } from "@lightprotocol/stateless.js";
+import { confirmTx, selectStateTreeInfo } from "@lightprotocol/stateless.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -8,7 +8,6 @@ const {
   LightSystemProgram,
   buildAndSignTx,
   createRpc,
-  defaultTestStateTreeAccounts,
   sendAndConfirmTx,
 } = require("@lightprotocol/stateless.js");
 
@@ -29,12 +28,16 @@ const connection = createRpc();
   /// Fetch latest blockhash
   const { blockhash } = await connection.getLatestBlockhash();
 
+  /// Get state tree info
+  const stateTreeInfos = await connection.getStateTreeInfos();
+  const treeInfo = selectStateTreeInfo(stateTreeInfos);
+
   /// Compress lamports to self
   const ix = await LightSystemProgram.compress({
     payer: fromKeypair.publicKey,
     toAddress: fromKeypair.publicKey,
     lamports: 1_000_000_000,
-    outputStateTree: defaultTestStateTreeAccounts().merkleTree,
+    outputStateTreeInfo: treeInfo,
   });
 
   /// Create a VersionedTransaction and sign it

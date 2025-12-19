@@ -20,7 +20,6 @@ import dotenv from "dotenv";
 import bs58 from "bs58";
 dotenv.config();
 
-const RPC_ENDPOINT = process.env.RPC_ENDPOINT;
 const MINT_ADDRESS = new PublicKey(process.env.MINT_ADDRESS!);
 const PAYER_KEYPAIR = Keypair.fromSecretKey(
   bs58.decode(process.env.PAYER_KEYPAIR!)
@@ -28,7 +27,8 @@ const PAYER_KEYPAIR = Keypair.fromSecretKey(
 
 (async () => {
   try {
-    const connection: Rpc = createRpc(RPC_ENDPOINT);
+    /// Localnet, expects `light test-validator` to be running:
+    const connection: Rpc = createRpc();
     const mintAddress = MINT_ADDRESS;
     const payer = PAYER_KEYPAIR;
 
